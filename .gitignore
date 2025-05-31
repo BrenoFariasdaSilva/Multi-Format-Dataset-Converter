@@ -1,0 +1,48 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore the MacOS DS_Store Files
+.DS_Store
+
+# Ignore the Windows .Desktop Files
+desktop.ini
+
+# Ignore the Compressed Files
+*.zip
+*.rar
+*.gz
+*.7z
+.tar.gz
+
+# Ignore the Data Directories
+*/Dados/
+*/Data/
+*/Dataset/
+*/Results/
+*/dados/
+*/data/
+*/dataset/
+*/results/
+*/Input/
+*/Output/
+
+# Ignore the Data Files
+*.csv
+*.xlsx
+*.txt
+*.arff
+*.json
+
+# Do not ignore the python files
+!*requirements.txt
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
