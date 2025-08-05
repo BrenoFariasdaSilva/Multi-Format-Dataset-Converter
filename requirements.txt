@@ -1,7 +1,12 @@
 colorama==0.4.6
+cramjam==2.10.0
+fastparquet==2024.11.0
+fsspec==2025.5.1
 liac-arff==2.5.0
 numpy==2.2.6
+packaging==25.0
 pandas==2.2.3
+pyarrow==20.0.0
 python-dateutil==2.9.0.post0
 pytz==2025.2
 scipy==1.15.3
