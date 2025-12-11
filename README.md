@@ -36,11 +36,10 @@ Project-Description.
 ## Table of Contents
 - [Multi-Format-Dataset-Converter. ](#multi-format-dataset-converter-)
   - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Requirements](#requirements)
+  - [Installation](#installation)
   - [Setup](#setup)
     - [Clone the repository](#clone-the-repository)
-  - [Installation:](#installation)
+  - [Installation:](#installation-1)
   - [Run Programing Language Code:](#run-programing-language-code)
     - [Dependencies](#dependencies)
   - [Usage](#usage)
@@ -51,28 +50,78 @@ Project-Description.
   - [License](#license)
     - [Apache License 2.0](#apache-license-20)
 
-## Introduction
+## Installation
 
-Detailed project description.
+* **Programming language:** Python 3.8+
 
-## Requirements
+This project includes a `Makefile` that automates creating a virtual environment and installing dependencies. Below are OS-specific prerequisites and commands to make `make` work and to install Python if needed.
 
-- **Python:** >= 3.8
-- **Required Python packages:** (also available in `requirements.txt`)
-  - pandas==2.2.3
-  - numpy==2.2.6
-  - fastparquet==2024.11.0
-  - pyarrow==20.0.0
-  - scipy==1.15.3
-  - liac-arff==2.5.0
-  - colorama==0.4.6
-  - tqdm==4.67.1
-  - cramjam==2.10.0
-  - fsspec==2025.5.1
-  - packaging==25.0
-  - python-dateutil==2.9.0.post0
-  - pytz==2025.2
-  - six==1.17.0
+Linux (Debian/Ubuntu):
+
+```bash
+sudo apt update
+sudo apt install -y python3 python3-venv python3-pip make build-essential
+```
+
+Linux (Fedora/CentOS):
+
+```bash
+sudo dnf install -y python3 python3-venv python3-pip make gcc gcc-c++
+```
+
+macOS:
+
+- Install Xcode command-line tools (provides `make`):
+
+```bash
+xcode-select --install
+```
+
+- Install Homebrew (if you prefer) and Python:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install python make
+```
+
+Windows:
+
+- Install Python from https://www.python.org/downloads/ (ensure "Add Python to PATH" is selected) or via the Microsoft Store.
+- To get a working `make` on Windows choose one of the options:
+  - Install WSL (recommended):
+
+```powershell
+wsl --install            # then use the Linux instructions inside WSL
+```
+
+  - Install Chocolatey and GNU Make:
+
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+choco install make -y
+```
+
+  - Or install GNU Make binaries (e.g., via GnuWin or make for Windows) — WSL or Chocolatey are the easiest.
+
+After installing system prerequisites, use the provided `Makefile` to create the virtual environment and install Python packages:
+
+```bash
+make dependencies   # create venv and install packages from requirements.txt
+make run            # run the converter (creates Logs/ and writes cleaned logs)
+```
+
+If you prefer to work without `make`, perform the steps manually:
+
+```bash
+python -m venv venv
+# activate the venv (Unix/macOS: `source venv/bin/activate`, Windows PowerShell: `.
+\venv\Scripts\Activate.ps1`)
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python main.py
+```
+
+See `requirements.txt` and `main.py` for project-specific dependencies and the entrypoint.
   - tzdata==2025.2
 
 - **Installation:** install dependencies using the provided requirements file:
