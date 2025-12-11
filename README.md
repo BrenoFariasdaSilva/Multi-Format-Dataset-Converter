@@ -290,7 +290,7 @@ If you use the Multi-Format-Dataset-Converter in your research, please cite it u
   author       = {Breno Farias da Silva},
   year         = {2025},
   howpublished = {\url{https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter}},
-  note         = {Python-based system for recursive dataset discovery, structural cleaning of text-based formats, and conversion between ARFF, CSV, Parquet, and TXT while preserving input directory layouts. Accessed on December 11, 2025}
+  note         = {A Python tool that recursively scans directories for ARFF, CSV, Parquet, and TXT files, applies minimal structural cleanup (whitespace and basic formatting fixes) to text-based formats, and converts each dataset into all supported formats for consistent and readable results. Accessed on December 11, 2025}
 }
 ```
 
