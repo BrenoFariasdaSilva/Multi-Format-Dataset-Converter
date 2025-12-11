@@ -8,9 +8,7 @@
   
 ---
 
-Welcome to [Multi-Format-Dataset-Converter.](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter), a Python-based system for converting dataset files in any of the ARFF, CSV, Parquet, and TXT file extensions to all of those, so you can have your dataset files standardized to a single format for better usability and readbility.
-
-This project does a recursive dataset files discovery, than do a structural cleaning of text-based formats, where Each file undergoes minimal structural cleanup (whitespace and formatting adjustments) before being loaded and converted. before saving the dataset file to all of the file formats mentioned.
+Welcome to [Multi-Format-Dataset-Converter.](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter), a Python tool that recursively scans your directories for ARFF, CSV, Parquet, and TXT files, applies minimal structural cleanup (whitespace and basic formatting fixes) to text-based formats, and converts each dataset into all supported formats for consistent and readable results.
 
 ---
 
