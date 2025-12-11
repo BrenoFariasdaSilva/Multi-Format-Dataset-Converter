@@ -39,18 +39,18 @@ Project-Description.
   - [Introduction](#introduction)
   - [Setup](#setup)
     - [Git](#git)
-      - [Linux](#linux)
-      - [MacOS](#macos)
-      - [Windows](#windows)
+        - [Linux](#linux)
+        - [macOS](#macos)
+        - [Windows](#windows)
     - [Clone the Repository](#clone-the-repository)
-  - [Python, Pip and Venv](#python-pip-and-venv)
-    - [Linux](#linux-1)
-    - [macOS](#macos-1)
-    - [Windows](#windows-1)
-  - [Make](#make)
-    - [Linux](#linux-2)
-    - [macOS](#macos-2)
-    - [Windows](#windows-2)
+    - [Python, Pip and Venv](#python-pip-and-venv)
+      - [Linux](#linux-1)
+      - [macOS](#macos-1)
+      - [Windows](#windows-1)
+    - [Make](#make)
+      - [Linux](#linux-2)
+      - [macOS](#macos-2)
+      - [Windows](#windows-2)
   - [Run Programing Language Code:](#run-programing-language-code)
     - [Dependencies](#dependencies)
   - [Usage](#usage)
@@ -71,7 +71,7 @@ This section provides instructions for installing Git, Python, Pip, Make, then t
 
 `git` is a distributed version control system that is widely used for tracking changes in source code during software development. In this project, `git` is used to download and manage the analyzed repositories, as well as to clone the project and its submodules. To install `git`, follow the instructions below based on your operating system:
 
-#### Linux
+##### Linux
 
 To install `git` on Linux, run:
 
@@ -79,7 +79,7 @@ To install `git` on Linux, run:
 sudo apt install git -y
 ```
 
-#### MacOS
+##### macOS
 
 To install `git` on MacOS, you can use Homebrew:
 
@@ -87,7 +87,7 @@ To install `git` on MacOS, you can use Homebrew:
 brew install git
 ```
 
-#### Windows
+##### Windows
 
 On Windows, you can download `git` from the official website [here](https://git-scm.com/downloads) and follow the installation instructions provided there.
 
@@ -112,23 +112,23 @@ git submodule init
 git submodule update
 ```
 
-## Python, Pip and Venv
+### Python, Pip and Venv
 
 You must have Python 3, Pip, and the `venv` module installed.
 
-### Linux
+#### Linux
 
 ``` bash
 sudo apt install python3 python3-pip python3-venv -y
 ```
 
-### macOS
+#### macOS
 
 ``` bash
 brew install python3
 ```
 
-### Windows
+#### Windows
 
 If you do not have Chocolatey installed, you can install it by running the following command in an **elevated PowerShell (Run as Administrator)**:
 
@@ -147,23 +147,23 @@ choco install python3
 
 Or download the installer from the official Python website.
 
-## Make 
+### Make 
 
 `Make` is used to run automated tasks defined in the project's Makefile, such as setting up environments, executing scripts, and managing Python dependencies.
 
-### Linux
+#### Linux
 
 ``` bash
 sudo apt install make -y
 ```
 
-### macOS
+#### macOS
 
 ``` bash
 brew install make
 ```
 
-### Windows
+#### Windows
 
 Available via Cygwin, MSYS2, or WSL.
 
