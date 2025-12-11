@@ -149,7 +149,7 @@ Or download the installer from the official Python website.
 
 ## Make 
 
-<!--  descripton -->
+`Make` is used to run automated tasks defined in the project's Makefile, such as setting up environments, executing scripts, and managing Python dependencies.
 
 ### Linux
 
