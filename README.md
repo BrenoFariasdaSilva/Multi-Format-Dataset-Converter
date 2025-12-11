@@ -188,6 +188,16 @@ Create the input directory:
 mkdir Input
 ```
 
+Now, place your dataset directories or files inside `./Input`. The `main.py` script will:
+
+1. Search the `./Input` directory recursively.
+2. Detect dataset files in the following formats:
+   - `.arff`
+   - `.csv`
+   - `.parquet`
+   - `.txt`
+3. Convert each detected file to the requested formats.
+4. Save all converted outputs inside the `./Output` directory, preserving the directory structure.
 
 Once everything is prepared, run the project using:
 
