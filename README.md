@@ -176,7 +176,13 @@ Available via Cygwin, MSYS2, or WSL.
 
 ## Usage/Run
 
-In order to run the project, run the following command:
+Before running the project, change to the repository root directory:
+
+```bash
+cd Multi-Format-Dataset-Converter
+```
+
+Once everything is prepared, run the project using:
 
 ```bash
 make
