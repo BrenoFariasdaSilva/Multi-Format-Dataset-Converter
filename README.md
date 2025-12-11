@@ -36,10 +36,8 @@ Project-Description.
 ## Table of Contents
 - [Multi-Format-Dataset-Converter. ](#multi-format-dataset-converter-)
   - [Table of Contents](#table-of-contents)
-  - [Installation](#installation)
   - [Setup](#setup)
-    - [Clone the repository](#clone-the-repository)
-  - [Installation:](#installation-1)
+    - [Clone the Repository](#clone-the-repository)
   - [Run Programing Language Code:](#run-programing-language-code)
     - [Dependencies](#dependencies)
   - [Usage](#usage)
@@ -50,128 +48,33 @@ Project-Description.
   - [License](#license)
     - [Apache License 2.0](#apache-license-20)
 
-## Installation
-
-* **Programming language:** Python 3.8+
-
-This project includes a `Makefile` that automates creating a virtual environment and installing dependencies. Below are OS-specific prerequisites and commands to make `make` work and to install Python if needed.
-
-Linux (Debian/Ubuntu):
-
-```bash
-sudo apt update
-sudo apt install -y python3 python3-venv python3-pip make build-essential
-```
-
-Linux (Fedora/CentOS):
-
-```bash
-sudo dnf install -y python3 python3-venv python3-pip make gcc gcc-c++
-```
-
-macOS:
-
-- Install Xcode command-line tools (provides `make`):
-
-```bash
-xcode-select --install
-```
-
-- Install Homebrew (if you prefer) and Python:
-
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install python make
-```
-
-Windows:
-
-- Install Python from https://www.python.org/downloads/ (ensure "Add Python to PATH" is selected) or via the Microsoft Store.
-- To get a working `make` on Windows choose one of the options:
-  - Install WSL (recommended):
-
-```powershell
-wsl --install            # then use the Linux instructions inside WSL
-```
-
-  - Install Chocolatey and GNU Make:
-
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-choco install make -y
-```
-
-  - Or install GNU Make binaries (e.g., via GnuWin or make for Windows) — WSL or Chocolatey are the easiest.
-
-After installing system prerequisites, use the provided `Makefile` to create the virtual environment and install Python packages:
-
-```bash
-make dependencies   # create venv and install packages from requirements.txt
-make run            # run the converter (creates Logs/ and writes cleaned logs)
-```
-
-If you prefer to work without `make`, perform the steps manually:
-
-```bash
-python -m venv venv
-# activate the venv (Unix/macOS: `source venv/bin/activate`, Windows PowerShell: `.
-\venv\Scripts\Activate.ps1`)
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-python main.py
-```
-
-See `requirements.txt` and `main.py` for project-specific dependencies and the entrypoint.
-  - tzdata==2025.2
-
-- **Installation:** install dependencies using the provided requirements file:
-
-```bash
-make dependencies
-```
-
 ## Setup
 
-### Clone the repository
+This section provides instructions for installing Git, Python, Pip, Make, then to clone the repository (if not done yet) and all required project dependencies. 
 
-1. Clone the repository with the following command:
+### Clone the Repository
 
-   ```bash
-   git clone https://github.com/BrenoFariasDaSilva/DDoS-Detector.git
-   cd DDoS-Detector
-   ```
+To clone this repository with all required submodules, use:
 
-## Installation:
-* **Programming language:** Python 3.8+
-
-* **Recommended (Makefile):** use the provided `Makefile` to prepare the virtual environment and install dependencies, then run the project:
-
-```bash
-make dependencies # Create venv and install packages from requirements.txt
+``` bash
+git clone --recurse-submodules https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter.git
 ```
 
-* **Manual (without make):**
+If you clone without submodules (not recommended):
 
-- Create and activate a virtual environment
-
-  - Unix / macOS:
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
-
-  - Windows (PowerShell):
-    ```powershell
-    python -m venv venv
-    .\venv\Scripts\Activate.ps1
-    ```
-
-- Install dependencies from `requirements.txt`:
-
-```bash
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+``` bash
+git clone https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter
 ```
+
+To initialize submodules manually:
+
+``` bash
+git submodule init
+git submodule update
+```
+
+If you don't have the git command, read the next subsection, which explains how to install it.
+
 
 ## Run Programing Language Code:
 
