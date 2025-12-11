@@ -51,7 +51,6 @@ Project-Description.
       - [Linux](#linux-2)
       - [macOS](#macos-2)
       - [Windows](#windows-2)
-  - [Run Programing Language Code:](#run-programing-language-code)
     - [Dependencies](#dependencies)
   - [Usage](#usage)
   - [Results - Optional](#results---optional)
@@ -166,12 +165,6 @@ brew install make
 #### Windows
 
 Available via Cygwin, MSYS2, or WSL.
-
-## Run Programing Language Code:
-
-```bash
-# Command here 
-```
 
 ### Dependencies
 
