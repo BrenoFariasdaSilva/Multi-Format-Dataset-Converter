@@ -199,6 +199,16 @@ Now, place your dataset directories or files inside `./Input`. The `main.py` scr
 3. Convert each detected file to the requested formats.
 4. Save all converted outputs inside the `./Output` directory, preserving the directory structure.
 
+You may also configure these constants inside `main.py`:
+
+```python
+# Execution Constants:
+VERBOSE = False  # Enable verbose logging if needed
+INPUT_DIRECTORY = "./Input"  # Path to input folder
+OUTPUT_DIRECTORY = "./Output"  # Path to output folder
+IGNORE_DIRECTORY_NAMED_WITH = ["Results"]  # Ignore directories containing these words
+```
+
 Once everything is prepared, run the project using:
 
 ```bash
