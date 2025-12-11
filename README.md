@@ -93,25 +93,36 @@ make dependencies
    ```
 
 ## Installation:
+* **Programming language:** Python 3.8+
 
-* Programing Language:
+* **Recommended (Makefile):** use the provided `Makefile` to prepare the virtual environment and install dependencies, then run the project:
 
-  * Manually:
-      ```bash
-      # Programing Language:
-      sudo apt install program-language -y
-      ```
+```bash
+make dependencies # Create venv and install packages from requirements.txt
+```
 
-  * Using Makefile:
-      ```bash
-      make install
-      ```
+* **Manual (without make):**
 
-  * Using ShellScript:
-      ```bash
-      chmod +x install.sh
-      sudo ./install.sh
-      ```  
+- Create and activate a virtual environment
+
+  - Unix / macOS:
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+  - Windows (PowerShell):
+    ```powershell
+    python -m venv venv
+    .\venv\Scripts\Activate.ps1
+    ```
+
+- Install dependencies from `requirements.txt`:
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
 
 ## Run Programing Language Code:
 
