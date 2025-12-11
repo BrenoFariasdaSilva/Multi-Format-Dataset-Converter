@@ -252,7 +252,33 @@ This command ensures the virtual environment and required libraries are installe
 
 ## Results
 
-Discuss the results obtained in the project.
+Below is an example demonstrating how the converter processes datasets and organizes the generated outputs.
+Input structure:
+
+```
+Input/
+└── CIC-IDS2017-Dataset/
+    ├── DDoS-Friday-no-metadata.parquet
+    └── DoS-Wednesday-no-metadata.parquet
+```
+
+After running the converter, the corresponding output directory mirrors the same structure and contains all generated formats:
+Output structure:
+
+```
+Output/
+└── CIC-IDS2017-Dataset/
+    ├── DDoS-Friday-no-metadata.arff
+    ├── DDoS-Friday-no-metadata.csv
+    ├── DDoS-Friday-no-metadata.parquet
+    ├── DDoS-Friday-no-metadata.txt
+    ├── DoS-Wednesday-no-metadata.arff
+    ├── DoS-Wednesday-no-metadata.csv
+    ├── DoS-Wednesday-no-metadata.parquet
+    └── DoS-Wednesday-no-metadata.txt
+```
+
+This example reflects the tool’s behavior: it recursively discovers supported datasets in `Input/`, performs minimal structural cleanup on text-based formats, and writes all converted versions—`ARFF`, `CSV`, `Parquet`, and `TXT`—into the corresponding mirrored directory inside `Output/`.
 
 ## How to Cite?
 
