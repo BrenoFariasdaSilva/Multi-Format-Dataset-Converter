@@ -54,7 +54,7 @@ Welcome to [Multi-Format-Dataset-Converter.](https://github.com/BrenoFariasdaSil
       - [Windows](#windows-2)
     - [Dependencies](#dependencies)
   - [Usage/Run](#usagerun)
-  - [Results - Optional](#results---optional)
+  - [Results](#results)
   - [How to Cite?](#how-to-cite)
   - [Contributing](#contributing)
   - [Collaborators](#collaborators)
@@ -250,7 +250,7 @@ make
 
 This command ensures the virtual environment and required libraries are installed before executing `main.py`.
 
-## Results - Optional
+## Results
 
 Discuss the results obtained in the project.
 
