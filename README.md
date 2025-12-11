@@ -182,6 +182,13 @@ Before running the project, change to the repository root directory:
 cd Multi-Format-Dataset-Converter
 ```
 
+Create the input directory:
+
+```bash
+mkdir Input
+```
+
+
 Once everything is prepared, run the project using:
 
 ```bash
