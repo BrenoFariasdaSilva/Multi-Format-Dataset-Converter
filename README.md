@@ -37,6 +37,7 @@ Welcome to [Multi-Format-Dataset-Converter.](https://github.com/BrenoFariasdaSil
 - [Multi-Format-Dataset-Converter. ](#multi-format-dataset-converter-)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
+    - [Structural Cleaning Performed by the Converter](#structural-cleaning-performed-by-the-converter)
   - [Setup](#setup)
     - [Git](#git)
         - [Linux](#linux)
@@ -61,6 +62,41 @@ Welcome to [Multi-Format-Dataset-Converter.](https://github.com/BrenoFariasdaSil
     - [Apache License 2.0](#apache-license-20)
 
 ## Introduction
+
+Welcome to [Multi-Format-Dataset-Converter](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter), a Python-based system for converting dataset files in any of the ARFF, CSV, Parquet, and TXT formats into all other supported formats. This tool standardizes datasets for improved organization, interoperability, and readability.
+
+The system performs recursive discovery of dataset files inside the `Input` directory, identifies valid dataset formats, applies structural cleaning rules, loads the cleaned data into a pandas DataFrame, and saves the dataset into all supported target formats while preserving directory structure.
+
+### Structural Cleaning Performed by the Converter
+
+Based on the cleaning logic defined in `main.py`, the project applies the following transformations before converting files:
+
+1. **ARFF files**
+   - Removes unnecessary spaces inside domain lists declared in `@attribute` lines.
+   - Example fix:
+     ```
+     @attribute color { red, blue , green }
+     ```
+     becomes:
+     ```
+     @attribute color {red,blue,green}
+     ```
+   - Only domain lists are modified; all other lines remain unchanged.
+
+2. **CSV and TXT files**
+   - Removes unnecessary whitespace around comma-separated values.
+   - Trims each field individually:
+     ```
+     value1 ,  value2, value3 
+     ```
+     becomes:
+     ```
+     value1,value2,value3
+     ```
+
+3. **Parquet files**
+   - Parquet files are binary and do not require textual cleaning.
+   - They are simply read and rewritten to ensure structural consistency, without any whitespace manipulation.
 
 ## Setup
 
