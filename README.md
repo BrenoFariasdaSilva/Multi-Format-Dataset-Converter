@@ -119,15 +119,15 @@ Discuss the results obtained in the project.
 
 ## How to Cite?
 
-If you use the Repository-Name in your research, please cite it using the following BibTeX entry:
+If you use the Multi-Format-Dataset-Converter in your research, please cite it using the following BibTeX entry:
 
 ```
-@misc{softwareRepository-Name:2024,
-  title = {Repository-Name: Project-Description},
+@misc{softwareMulti-Format-Dataset-Converter:2025,
+  title = {Multi-Format-Dataset-Converter: Project-Description},
   author = {Breno Farias da Silva},
-  year = {2024},
-  howpublished = {https://github.com/BrenoFariasdaSilva/Repository-Name},
-  note = {Accessed on September 11, 2024}
+  year = {2025},
+  howpublished = {https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter},
+  note = {Accessed on December 11, 2025}
 }
 ```
 
