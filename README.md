@@ -42,6 +42,10 @@ Project-Description.
       - [Linux](#linux)
       - [MacOS](#macos)
       - [Windows](#windows)
+  - [Python, Pip and Venv](#python-pip-and-venv)
+    - [Linux](#linux-1)
+    - [macOS](#macos-1)
+    - [Windows](#windows-1)
   - [Run Programing Language Code:](#run-programing-language-code)
     - [Dependencies](#dependencies)
   - [Usage](#usage)
@@ -102,6 +106,41 @@ brew install git
 #### Windows
 
 On Windows, you can download `git` from the official website [here](https://git-scm.com/downloads) and follow the installation instructions provided there.
+
+## Python, Pip and Venv
+
+You must have Python 3, Pip, and the `venv` module installed.
+
+### Linux
+
+``` bash
+sudo apt install python3 python3-pip python3-venv -y
+```
+
+### macOS
+
+``` bash
+brew install python3
+```
+
+### Windows
+
+If you do not have Chocolatey installed, you can install it by running the following command in an **elevated PowerShell (Run as Administrator)**:
+
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; `
+[System.Net.ServicePointManager]::SecurityProtocol = `
+    [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
+Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+```
+
+Once Chocolatey is installed, you can install Python using:
+
+``` bash
+choco install python3
+```
+
+Or download the installer from the official Python website.
 
 ## Run Programing Language Code:
 
