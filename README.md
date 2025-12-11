@@ -52,7 +52,7 @@ Project-Description.
       - [macOS](#macos-2)
       - [Windows](#windows-2)
     - [Dependencies](#dependencies)
-  - [Usage](#usage)
+  - [Usage/Run](#usagerun)
   - [Results - Optional](#results---optional)
   - [How to Cite?](#how-to-cite)
   - [Contributing](#contributing)
@@ -174,7 +174,7 @@ Available via Cygwin, MSYS2, or WSL.
    make dependencies
    ```
 
-## Usage
+## Usage/Run
 
 In order to run the project, run the following command:
 
