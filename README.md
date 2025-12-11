@@ -204,9 +204,9 @@ You may also configure these constants inside `main.py`:
 ```python
 # Execution Constants:
 VERBOSE = False  # Enable verbose logging if needed
-INPUT_DIRECTORY = "./Input"  # Path to input folder
-OUTPUT_DIRECTORY = "./Output"  # Path to output folder
-IGNORE_DIRECTORY_NAMED_WITH = ["Results"]  # Ignore directories containing these words
+INPUT_DIRECTORY = "./Input" # Path to input folder
+OUTPUT_DIRECTORY = "./Output" # Path to output folder
+IGNORE_DIRECTORY_NAMED_WITH = ["Results"] # Ignore directories containing these words
 ```
 
 Once everything is prepared, run the project using:
