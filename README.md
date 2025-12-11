@@ -182,7 +182,7 @@ In order to run the project, run the following command:
 make
 ```
 
-This command always verify if the virtual environment and libraries are installed before running the `main.py` python code.
+This command ensures the virtual environment and required libraries are installed before executing `main.py`.
 
 ## Results - Optional
 
