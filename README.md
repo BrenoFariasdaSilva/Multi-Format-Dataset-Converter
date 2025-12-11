@@ -57,7 +57,29 @@ Detailed project description.
 
 ## Requirements
 
-Bullet points of the requirements.
+- **Python:** >= 3.8
+- **Required Python packages:** (also available in `requirements.txt`)
+  - pandas==2.2.3
+  - numpy==2.2.6
+  - fastparquet==2024.11.0
+  - pyarrow==20.0.0
+  - scipy==1.15.3
+  - liac-arff==2.5.0
+  - colorama==0.4.6
+  - tqdm==4.67.1
+  - cramjam==2.10.0
+  - fsspec==2025.5.1
+  - packaging==25.0
+  - python-dateutil==2.9.0.post0
+  - pytz==2025.2
+  - six==1.17.0
+  - tzdata==2025.2
+
+- **Installation:** install dependencies using the provided requirements file:
+
+```bash
+make dependencies
+```
 
 ## Setup
 
