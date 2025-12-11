@@ -46,6 +46,10 @@ Project-Description.
     - [Linux](#linux-1)
     - [macOS](#macos-1)
     - [Windows](#windows-1)
+  - [Make](#make)
+    - [Linux](#linux-2)
+    - [macOS](#macos-2)
+    - [Windows](#windows-2)
   - [Run Programing Language Code:](#run-programing-language-code)
     - [Dependencies](#dependencies)
   - [Usage](#usage)
@@ -141,6 +145,26 @@ choco install python3
 ```
 
 Or download the installer from the official Python website.
+
+## Make 
+
+<!--  descripton -->
+
+### Linux
+
+``` bash
+sudo apt install make -y
+```
+
+### macOS
+
+``` bash
+brew install make
+```
+
+### Windows
+
+Available via Cygwin, MSYS2, or WSL.
 
 ## Run Programing Language Code:
 
