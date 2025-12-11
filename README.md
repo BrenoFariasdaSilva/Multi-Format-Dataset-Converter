@@ -38,11 +38,11 @@ Project-Description.
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Setup](#setup)
-    - [Clone the Repository](#clone-the-repository)
     - [Git](#git)
       - [Linux](#linux)
       - [MacOS](#macos)
       - [Windows](#windows)
+    - [Clone the Repository](#clone-the-repository)
   - [Python, Pip and Venv](#python-pip-and-venv)
     - [Linux](#linux-1)
     - [macOS](#macos-1)
@@ -67,29 +67,6 @@ Project-Description.
 
 This section provides instructions for installing Git, Python, Pip, Make, then to clone the repository (if not done yet) and all required project dependencies. 
 
-### Clone the Repository
-
-To clone this repository with all required submodules, use:
-
-``` bash
-git clone --recurse-submodules https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter.git
-```
-
-If you clone without submodules (not recommended):
-
-``` bash
-git clone https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter
-```
-
-To initialize submodules manually:
-
-``` bash
-git submodule init
-git submodule update
-```
-
-If you don't have the git command, read the next subsection, which explains how to install it.
-
 ### Git
 
 `git` is a distributed version control system that is widely used for tracking changes in source code during software development. In this project, `git` is used to download and manage the analyzed repositories, as well as to clone the project and its submodules. To install `git`, follow the instructions below based on your operating system:
@@ -113,6 +90,27 @@ brew install git
 #### Windows
 
 On Windows, you can download `git` from the official website [here](https://git-scm.com/downloads) and follow the installation instructions provided there.
+
+### Clone the Repository
+
+Now that git is installed, it's time to clone this repository with all required submodules, use:
+
+``` bash
+git clone --recurse-submodules https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter.git
+```
+
+If you clone without submodules (not recommended):
+
+``` bash
+git clone https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter
+```
+
+To initialize submodules manually:
+
+``` bash
+git submodule init
+git submodule update
+```
 
 ## Python, Pip and Venv
 
