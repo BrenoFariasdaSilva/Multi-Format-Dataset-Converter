@@ -38,6 +38,10 @@ Project-Description.
   - [Table of Contents](#table-of-contents)
   - [Setup](#setup)
     - [Clone the Repository](#clone-the-repository)
+    - [Git](#git)
+      - [Linux](#linux)
+      - [MacOS](#macos)
+      - [Windows](#windows)
   - [Run Programing Language Code:](#run-programing-language-code)
     - [Dependencies](#dependencies)
   - [Usage](#usage)
@@ -75,6 +79,29 @@ git submodule update
 
 If you don't have the git command, read the next subsection, which explains how to install it.
 
+### Git
+
+`git` is a distributed version control system that is widely used for tracking changes in source code during software development. In this project, `git` is used to download and manage the analyzed repositories, as well as to clone the project and its submodules. To install `git`, follow the instructions below based on your operating system:
+
+#### Linux
+
+To install `git` on Linux, run:
+
+```bash
+sudo apt install git -y
+```
+
+#### MacOS
+
+To install `git` on MacOS, you can use Homebrew:
+
+```bash
+brew install git
+```
+
+#### Windows
+
+On Windows, you can download `git` from the official website [here](https://git-scm.com/downloads) and follow the installation instructions provided there.
 
 ## Run Programing Language Code:
 
