@@ -99,6 +99,29 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def clean_csv_or_txt_lines(lines):
+    """
+    Cleans TXT and CSV files by removing unnecessary spaces around comma-separated values.
+
+    :param lines: List of lines read from the file.
+    :return: List of cleaned lines with sanitized comma-separated values.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        cleaned_lines = []  # List to store cleaned lines
+
+        for line in lines:  # Iterate through each line
+            values = line.strip().split(",")  # Split the line on commas
+            cleaned_values = [val.strip() for val in values]  # Strip whitespace
+            cleaned_line = ",".join(cleaned_values) + "\n"  # Join cleaned values and add newline
+            cleaned_lines.append(cleaned_line)  # Add cleaned line
+
+        return cleaned_lines  # Return the list of cleaned lines
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def estimate_bytes_for_lines(lines):
     """
     Estimate the number of bytes a list of text lines will occupy when
