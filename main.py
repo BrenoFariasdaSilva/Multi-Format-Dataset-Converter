@@ -99,6 +99,39 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def perform_conversions(df, formats_list: Optional[list], dest_dir: Optional[str], name: Optional[str]) -> None:
+    """
+    Convert a DataFrame into the requested output formats and save to destination directory.
+
+    :param df: The pandas DataFrame to convert.
+    :param formats_list: The list of format names to generate (e.g., ['arff','csv']).
+    :param dest_dir: The destination directory where outputs will be saved.
+    :param name: The base filename (without extension) for output files.
+    :return: None
+    """
+
+    formats = formats_list or []  # Ensure formats is a list to avoid issues with None
+    df = normalize_dataframe_types(df)  # Normalize DataFrame types before any conversion to ensure homogeneous column types
+    dest_dir_str = str(dest_dir) if dest_dir is not None else ""  # Ensure os.path.join receives a string
+    dest_dir_str = os.path.abspath(os.path.normpath(dest_dir_str))  # Normalize and absolutize dest_dir to ensure consistent writes and space verifies
+    name_str = str(name) if name is not None else ""  # Ensure filename component is a string
+
+    dir_created = verify_filepath_exists(dest_dir_str)  # Determine whether destination directory already exists
+
+    if "arff" in formats:  # If ARFF format is requested for output
+        dir_created = create_destination_if_missing(dest_dir_str, dir_created)  # Verify and create destination directory lazily then update flag
+        convert_to_arff(df, os.path.join(dest_dir_str, f"{name_str}.arff"))  # Convert and save as ARFF format
+    if "csv" in formats:  # If CSV format is requested for output
+        dir_created = create_destination_if_missing(dest_dir_str, dir_created)  # Verify and create destination directory lazily then update flag
+        convert_to_csv(df, os.path.join(dest_dir_str, f"{name_str}.csv"))  # Convert and save as CSV format
+    if "parquet" in formats:  # If Parquet format is requested for output
+        dir_created = create_destination_if_missing(dest_dir_str, dir_created)  # Verify and create destination directory lazily then update flag
+        convert_to_parquet(df, os.path.join(dest_dir_str, f"{name_str}.parquet"))  # Convert and save as Parquet format
+    if "txt" in formats:  # If TXT format is requested for output
+        dir_created = create_destination_if_missing(dest_dir_str, dir_created)  # Verify and create destination directory lazily then update flag
+        convert_to_txt(df, os.path.join(dest_dir_str, f"{name_str}.txt"))  # Convert and save as TXT format
+
+
 def batch_convert(input_directory=None, output_directory=None, formats=None):
     """
     Batch converts dataset files from the input directory into multiple output formats
