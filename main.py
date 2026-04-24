@@ -12,7 +12,8 @@ Short Description:
 	converted outputs (ARFF, CSV, Parquet, TXT) to a mirrored `Output`
 	directory structure.
 
-Defaults & Behavior:
+
+defaults & Behavior:
 	- Default input directory: ./Input
 	- Default output directory: ./Output
 	- Supported input formats: .arff, .csv, .parquet, .txt
@@ -90,6 +91,7 @@ RUN_FUNCTIONS = {
    "Play Sound": True, # Set to True to play a sound when the program finishes
 }
 
+
 def verbose_output(true_string="", false_string=""):
 	"""
 	Outputs a message if the VERBOSE constant is set to True.
@@ -103,6 +105,7 @@ def verbose_output(true_string="", false_string=""):
 		print(true_string) # Output the true statement string
 	elif false_string != "": # If the false_string is set
 		print(false_string) # Output the false statement string
+
 
 def parse_cli_arguments():
 	"""
@@ -122,6 +125,7 @@ def parse_cli_arguments():
 
 	return parser.parse_args() # Return parsed CLI arguments
 
+
 def verify_filepath_exists(filepath):
 	"""
 	Verify if a file or folder exists at the specified path.
@@ -133,6 +137,7 @@ def verify_filepath_exists(filepath):
 	verbose_output(true_string=f"{BackgroundColors.GREEN}Verifying if the file or folder exists at the path: {BackgroundColors.CYAN}{filepath}{Style.RESET_ALL}") # Output the verbose message
 
 	return os.path.exists(filepath) # Return True if the file or folder exists, False otherwise
+
 
 def resolve_io_paths(args):
 	"""
@@ -162,6 +167,7 @@ def resolve_io_paths(args):
 
 	return input_path, output_path # Return validated paths
 
+
 def configure_verbose_mode(args):
 	"""
 	Enable verbose output mode when requested via CLI.
@@ -173,6 +179,7 @@ def configure_verbose_mode(args):
 	if args.verbose: # If verbose mode requested
 		global VERBOSE # Use global variable
 		VERBOSE = True # Enable verbose mode
+
 
 def create_directories(directory_name):
 	"""
@@ -186,6 +193,7 @@ def create_directories(directory_name):
 
 	if not os.path.exists(directory_name): # If the directory does not exist
 		os.makedirs(directory_name) # Create the directory
+
 
 def get_dataset_files(directory=INPUT_DIRECTORY):
 	"""
@@ -208,6 +216,7 @@ def get_dataset_files(directory=INPUT_DIRECTORY):
 
 	return dataset_files # Return the list of dataset files
 
+
 def resolve_dataset_files(input_directory):
 	"""
 	Resolve dataset files from a directory or a single file path.
@@ -220,6 +229,7 @@ def resolve_dataset_files(input_directory):
 		return [input_directory] # Process only that one file
 
 	return get_dataset_files(input_directory) # Otherwise, scan directory recursively
+
 
 def resolve_formats(formats):
 	"""
@@ -237,6 +247,7 @@ def resolve_formats(formats):
 
 	return [f.strip().lower().lstrip(".") for f in formats if isinstance(f, str)] # Clean list
 
+
 def resolve_destination_directory(input_directory, input_path, output_directory):
 	"""
 	Determine where converted files should be saved.
@@ -252,6 +263,7 @@ def resolve_destination_directory(input_directory, input_path, output_directory)
 
 	rel_dir = os.path.relpath(os.path.dirname(input_path), input_directory) # Subdir path
 	return os.path.join(output_directory, rel_dir) if rel_dir != "." else output_directory # Preserve structure
+
 
 def get_free_space_bytes(path):
 	"""
@@ -272,6 +284,7 @@ def get_free_space_bytes(path):
 	except Exception as e: # Catch any errors
 		verbose_output(f"{BackgroundColors.RED}Failed to retrieve disk usage for {target}: {e}{Style.RESET_ALL}") # Log error
 		return 0 # Fallback to zero
+
 
 def format_size_units(size_bytes):
 	"""
@@ -301,6 +314,7 @@ def format_size_units(size_bytes):
 
 	return f"{int(size)} Bytes" # Return bytes if less than 1 KB
 
+
 def has_enough_space_for_path(path, required_bytes):
 	"""
 	Verify whether the filesystem containing the specified path has at least
@@ -322,6 +336,7 @@ def has_enough_space_for_path(path, required_bytes):
 
 	return free >= required_bytes # Return comparison result
 
+
 def ensure_enough_space(path, required_bytes):
 	"""
 	Ensure that the filesystem has enough space to write the required number of bytes.
@@ -334,6 +349,7 @@ def ensure_enough_space(path, required_bytes):
 	if not has_enough_space_for_path(path, required_bytes): # Verify free space for the write operation
 		free = get_free_space_bytes(os.path.dirname(path) or ".")
 		raise OSError(f"Not enough disk space to write {path}. Free: {format_size_units(free)}; required: {format_size_units(required_bytes)}")
+
 
 def estimate_bytes_arff(df, overhead, attributes):
 	"""
@@ -361,6 +377,7 @@ def estimate_bytes_arff(df, overhead, attributes):
 	except Exception: # Fallback: estimate via CSV
 		return max(1024, int(df.memory_usage(deep=True).sum())) # Estimate size based on DataFrame memory usage
 
+
 def estimate_bytes_csv(df, overhead):
 	"""
 	Estimate required bytes to write a CSV file using an in-memory buffer.
@@ -378,6 +395,7 @@ def estimate_bytes_csv(df, overhead):
 	except Exception: # Fallback to memory usage
 		return max(1024, int(df.memory_usage(deep=True).sum())) # Estimate size based on DataFrame memory usage
 
+
 def estimate_bytes_parquet(df):
 	"""
 	Estimate required bytes for Parquet output using DataFrame memory size.
@@ -387,6 +405,7 @@ def estimate_bytes_parquet(df):
 	"""
 
 	return max(1024, int(df.memory_usage(deep=True).sum())) # Estimate size based on DataFrame memory usage
+
 
 def estimate_bytes_from_lines(lines, overhead):
 	"""
@@ -398,6 +417,7 @@ def estimate_bytes_from_lines(lines, overhead):
 	"""
 
 	return max(1024, sum(len((ln or "").encode("utf-8")) for ln in lines) + overhead) # Estimate byte size
+
 
 def clean_parquet_file(input_path, cleaned_path):
 	"""
@@ -414,6 +434,7 @@ def clean_parquet_file(input_path, cleaned_path):
 	ensure_enough_space(cleaned_path, required_bytes) # Ensure enough space to write the cleaned file
 
 	df.to_parquet(cleaned_path, index=False) # Write DataFrame back to parquet at destination
+
 
 def clean_arff_lines(lines):
 	"""
@@ -440,6 +461,7 @@ def clean_arff_lines(lines):
 
 	return cleaned_lines # Return the list of cleaned lines
 
+
 def clean_csv_or_txt_lines(lines):
 	"""
 	Cleans TXT and CSV files by removing unnecessary spaces around comma-separated values.
@@ -458,6 +480,7 @@ def clean_csv_or_txt_lines(lines):
 
 	return cleaned_lines # Return the list of cleaned lines
 
+
 def estimate_bytes_for_lines(lines):
 	"""
 	Estimate the number of bytes a list of text lines will occupy when
@@ -470,6 +493,7 @@ def estimate_bytes_for_lines(lines):
 	verbose_output(f"{BackgroundColors.GREEN}Estimating UTF-8 byte size for provided lines...{Style.RESET_ALL}") # Output verbose message
 
 	return sum(len((ln or "").encode("utf-8")) for ln in lines) # Compute and return byte size
+
 
 def write_cleaned_lines_to_file(cleaned_path, cleaned_lines):
 	"""
@@ -485,6 +509,7 @@ def write_cleaned_lines_to_file(cleaned_path, cleaned_lines):
 
 	with open(cleaned_path, "w", encoding="utf-8") as f: # Open the cleaned file path for writing
 		f.writelines(cleaned_lines) # Write all cleaned lines to the output file
+
 
 def clean_file(input_path, cleaned_path):
 	"""
@@ -517,6 +542,7 @@ def clean_file(input_path, cleaned_path):
 
 	write_cleaned_lines_to_file(cleaned_path, cleaned_lines) # Write cleaned lines to the cleaned file path
 
+
 def load_arff_with_scipy(input_path):
 	"""
 	Attempt to load an ARFF file using scipy. Decodes byte strings when necessary.
@@ -534,6 +560,7 @@ def load_arff_with_scipy(input_path):
 
 	return df # Return the DataFrame with decoded strings
 
+
 def load_arff_with_liac(input_path):
 	"""
 	Load an ARFF file using the liac-arff library.
@@ -546,6 +573,7 @@ def load_arff_with_liac(input_path):
 		data = arff.load(f) # Load using liac-arff
 
 	return pd.DataFrame(data["data"], columns=[attr[0] for attr in data["attributes"]]) # Convert to DataFrame
+
 
 def load_arff_file(input_path):
 	"""
@@ -565,6 +593,7 @@ def load_arff_file(input_path):
 		except Exception as e2: # If both fail, raise an error
 			raise RuntimeError(f"Failed to load ARFF file with both scipy and liac-arff: {e2}")
 
+
 def load_csv_file(input_path):
 	"""
 	Load a CSV file into a pandas DataFrame.
@@ -574,6 +603,7 @@ def load_csv_file(input_path):
 	"""
 
 	return pd.read_csv(input_path) # Load the CSV file
+
 
 def load_parquet_file(input_path):
 	"""
@@ -586,6 +616,7 @@ def load_parquet_file(input_path):
 	pf = ParquetFile(input_path) # Load the Parquet file using fastparquet
 	return pf.to_pandas() # Convert the Parquet file to a pandas DataFrame
 
+
 def load_txt_file(input_path):
 	"""
 	Load a TXT file into a pandas DataFrame, assuming tab-separated values.
@@ -595,6 +626,7 @@ def load_txt_file(input_path):
 	"""
 
 	return pd.read_csv(input_path, sep="\t") # Load TXT file using tab separator
+
 
 def load_dataset(input_path):
 	"""
@@ -621,6 +653,7 @@ def load_dataset(input_path):
 		raise ValueError(f"Unsupported file format: {ext}")
 
 	return df # Return the loaded DataFrame
+
 
 def convert_to_arff(df, output_path):
 	"""
@@ -650,6 +683,7 @@ def convert_to_arff(df, output_path):
 	with open(output_path, "w") as f: # Open the output file for writing
 		arff.dump(arff_dict, f) # Dump the ARFF data into the file using liac-arff
 
+
 def convert_to_csv(df, output_path):
 	"""
 	Convert a pandas DataFrame to CSV format and save it to the specified output path.
@@ -666,6 +700,7 @@ def convert_to_csv(df, output_path):
 
 	df.to_csv(output_path, index=False) # Save the DataFrame to the specified output path in CSV format, without the index
 
+
 def convert_to_parquet(df, output_path):
 	"""
 	Convert a pandas DataFrame to PARQUET format and save it to the specified output path.
@@ -681,6 +716,7 @@ def convert_to_parquet(df, output_path):
 	ensure_enough_space(output_path, bytes_needed) # Ensure enough space to write the PARQUET file
 
 	df.to_parquet(output_path, index=False) # Save the DataFrame to the specified output path in PARQUET format, without the index
+
 
 def convert_to_txt(df, output_path):
 	"""
@@ -708,6 +744,7 @@ def convert_to_txt(df, output_path):
 	ensure_enough_space(output_path, bytes_needed) # Ensure enough space to write the TXT file
 
 	df.to_csv(output_path, sep="\t", index=False) # Save the DataFrame to the specified output path in TXT format, using tab as the separator and without the index
+
 
 def batch_convert(input_directory=INPUT_DIRECTORY, output_directory=OUTPUT_DIRECTORY, formats=None):
 	"""
@@ -760,6 +797,7 @@ def batch_convert(input_directory=INPUT_DIRECTORY, output_directory=OUTPUT_DIREC
 			
 		print() # Print a newline for better readability between files
 
+
 def calculate_execution_time(start_time, finish_time):
 	"""
 	Calculates the execution time between start and finish times and formats it as hh:mm:ss.
@@ -773,6 +811,7 @@ def calculate_execution_time(start_time, finish_time):
 	hours, remainder = divmod(delta.seconds, 3600) # Calculate the hours, minutes and seconds
 	minutes, seconds = divmod(remainder, 60) # Calculate the minutes and seconds
 	return f"{hours:02d}:{minutes:02d}:{seconds:02d}" # Format the execution time
+
 
 def play_sound():
 	"""
@@ -791,6 +830,7 @@ def play_sound():
 			print(f"{BackgroundColors.RED}The {BackgroundColors.CYAN}{current_os}{BackgroundColors.RED} is not in the {BackgroundColors.CYAN}SOUND_COMMANDS dictionary{BackgroundColors.RED}. Please add it!{Style.RESET_ALL}")
 	else: # If the sound file does not exist
 		print(f"{BackgroundColors.RED}Sound file {BackgroundColors.CYAN}{SOUND_FILE}{BackgroundColors.RED} not found. Make sure the file exists.{Style.RESET_ALL}")
+
 
 def main():
 	"""
