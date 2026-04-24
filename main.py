@@ -99,6 +99,43 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def process_dataset_paths(ds_paths: list, context: dict, cfg: dict) -> None:
+    """
+    Process configured paths for a single dataset entry.
+
+    :param ds_paths: Iterable of paths configured for the dataset.
+    :param context: Processing context dictionary with runtime values.
+    :param cfg: Full configuration dictionary for fallback values.
+    :return: None
+    """
+
+    try:  # Wrap processing logic to ensure production-safe monitoring
+        if isinstance(ds_paths, str):  # Verify ds_paths is a single string path
+            ds_paths = [ds_paths]  # Wrap single string into a list for uniform processing
+        elif not isinstance(ds_paths, (list, tuple)):  # Verify dataset entry is an iterable of paths
+            return  # Return early when ds_paths is not a valid iterable
+
+        for ds_path in ds_paths:  # Iterate configured paths for this dataset entry
+            effective_input = ds_path  # Set effective input directory for this configured path
+            out_dir = context.get("output_directory")  # Retrieve output_directory from context which may be None
+            effective_output_base = str(out_dir) if out_dir else os.path.join(str(ds_path), cfg.get("output_directory", "Converted"))  # Determine per-dataset base output directory as a string
+            dataset_files = resolve_dataset_files(effective_input)  # Resolve dataset files for this configured path
+            if not dataset_files:  # If no files found for this configured path
+                print(f"{BackgroundColors.RED}No dataset files found in {BackgroundColors.CYAN}{effective_input}{Style.RESET_ALL}")  # Print error message when no files found
+                continue  # Continue to next configured path when empty
+
+            formats_list = resolve_formats(context.get("formats"))  # Normalize and validate output formats for this path
+            len_dataset_files = len(dataset_files)  # Count files to process for progress reporting
+
+            pbar = tqdm(dataset_files, desc=f"{BackgroundColors.CYAN}Converting {BackgroundColors.CYAN}{len_dataset_files}{BackgroundColors.GREEN} {'file' if len_dataset_files == 1 else 'files'}{Style.RESET_ALL}", unit="file", colour="green", total=len_dataset_files, leave=False, dynamic_ncols=True)  # Create a single-line progress bar for the conversion process
+
+            for idx, input_path in enumerate(pbar, start=1):  # Iterate files for this configured path with index
+                process_dataset_file(idx, len_dataset_files, input_path, effective_input, effective_output_base, formats_list, pbar)  # Delegate per-file processing to function
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def process_dataset_file(idx: int, len_dataset_files: int, input_path: str, effective_input: str, effective_output_base: str, formats_list: list, pbar) -> None:
     """
     Process a single dataset file: clean, load and convert to requested formats.
