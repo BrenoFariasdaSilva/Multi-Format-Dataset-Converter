@@ -99,6 +99,23 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def configure_verbose_mode(args):
+    """
+    Enable verbose output mode when requested via CLI.
+
+    :param args: Parsed CLI arguments.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        if args.verbose:  # If verbose mode requested
+            global VERBOSE  # Use global variable
+            VERBOSE = True  # Enable verbose mode
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def configure_input_output_formats(args):
     """
     Update DEFAULTS with input and output file formats from CLI arguments.
