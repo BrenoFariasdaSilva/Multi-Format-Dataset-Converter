@@ -99,6 +99,36 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def configure_input_output_formats(args):
+    """
+    Update DEFAULTS with input and output file formats from CLI arguments.
+
+    :param args: Parsed CLI arguments.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        global DEFAULTS  # Declare that we will assign to the module-global DEFAULTS
+
+        if DEFAULTS is None:  # Verify DEFAULTS is initialized before mutation
+            DEFAULTS = get_default_config()  # Initialize DEFAULTS if not yet initialized
+
+        cfg_section = DEFAULTS.setdefault("dataset_converter", {})  # Retrieve or create the dataset_converter section in DEFAULTS
+
+        if hasattr(args, "input_file_formats") and args.input_file_formats:  # Verify if input formats were provided via CLI
+            parsed = [file.strip().lower().lstrip(".") for file in args.input_file_formats.split(",") if file.strip()]  # Parse and normalize comma-separated input formats from CLI
+            if parsed:  # Only update when parsed list is non-empty
+                cfg_section["input_file_formats"] = parsed  # Override input_file_formats in DEFAULTS with CLI-provided value
+
+        if hasattr(args, "output_file_formats") and args.output_file_formats:  # Verify if output formats were provided via CLI
+            parsed = [file.strip().lower().lstrip(".") for file in args.output_file_formats.split(",") if file.strip()]  # Parse and normalize comma-separated output formats from CLI
+            if parsed:  # Only update when parsed list is non-empty
+                cfg_section["output_file_formats"] = parsed  # Override output_file_formats in DEFAULTS with CLI-provided value
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def create_directories(directory_name):
     """
     Creates a directory if it does not exist.
