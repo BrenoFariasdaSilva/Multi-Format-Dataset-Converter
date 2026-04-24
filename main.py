@@ -99,6 +99,54 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def parse_cli_arguments():
+    """
+    Parse command-line arguments for the dataset converter.
+
+    :return: Parsed ArgumentParser namespace.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        verbose_output(
+            f"{BackgroundColors.GREEN}Parsing command-line arguments...{Style.RESET_ALL}"
+        )  # Output the verbose message
+
+        parser = argparse.ArgumentParser(
+            description="Multi-Format Dataset Converter: convert ARFF/CSV/Parquet/TXT datasets"
+        )  # Create the argument parser
+
+        parser.add_argument(
+            "-i", "--input", type=str, help="Input path (file or directory). If not provided, uses ./Input"
+        )  # Input path argument
+        parser.add_argument(
+            "-o", "--output", type=str, help="Output directory. If not provided, uses ./Converted"
+        )  # Output directory argument
+        parser.add_argument(
+            "-f",
+            "--formats",
+            type=str,
+            help="Comma-separated output formats to produce (arff,csv,parquet,txt). If not provided, all formats are produced",
+        )  # Output formats argument
+        parser.add_argument(
+            "--input-file-formats",
+            type=str,
+            help="Comma-separated input formats to discover (arff,csv,parquet,txt). If not provided, uses config",
+        )  # Input file formats argument
+        parser.add_argument(
+            "--output-file-formats",
+            type=str,
+            help="Comma-separated output formats to produce (arff,csv,parquet,txt). If not provided, uses config",
+        )  # Output file formats argument
+        parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")  # Verbose mode flag
+        parser.add_argument("--low-memory", dest="low_memory", action="store_true", help="Enable low memory mode")  # Low memory mode flag
+        parser.add_argument("--no-low-memory", dest="no_low_memory", action="store_true", help="Disable low memory mode")  # No low memory mode flag
+
+        return parser.parse_args()  # Return parsed CLI arguments
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def resolve_low_memory(cli_args: "argparse.Namespace", config: dict) -> bool:
     """
     Resolve final low_memory flag using CLI arguments and configuration.
