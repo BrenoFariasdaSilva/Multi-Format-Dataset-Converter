@@ -99,6 +99,24 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def load_arff_with_liac(input_path):
+    """
+    Load an ARFF file using the liac-arff library.
+
+    :param input_path: Path to the ARFF file.
+    :return: pandas DataFrame loaded from the ARFF file.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        with open(input_path, "r", encoding="utf-8") as f:  # Open the ARFF file for reading
+            data = arff.load(f)  # Load using liac-arff
+
+        return pd.DataFrame(data["data"], columns=[attr[0] for attr in data["attributes"]])  # Convert to DataFrame
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def load_arff_file(input_path):
     """
     Load an ARFF file, trying scipy first and falling back to liac-arff if needed.
