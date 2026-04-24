@@ -99,6 +99,26 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def get_and_verify_dataset_files(input_directory: str, cfg: dict) -> tuple:
+    """
+    Gather dataset files and verify non-empty, printing message on empty.
+
+    :param input_directory: Path to the input directory to scan for datasets.
+    :param cfg: Configuration dictionary used for fallback values.
+    :return: Tuple containing (dataset_files_list, len_dataset_files).
+    """
+
+    try:  # Wrap function logic to ensure production-safe monitoring
+        dataset_files, len_dataset_files = gather_dataset_files(input_directory)  # Gather dataset files and their count for processing
+        if not dataset_files:  # If no dataset files were found
+            print(f"{BackgroundColors.RED}No dataset files found in {BackgroundColors.CYAN}{input_directory}{Style.RESET_ALL}")  # Print error message when directory is empty
+            return [], 0  # Return empty results to signal caller to exit early
+        return dataset_files, len_dataset_files  # Return discovered dataset files and their count
+    except Exception as e:  # Catch exceptions inside function
+        print(str(e))  # Print function exception to terminal for logs
+        raise  # Re-raise to preserve failure semantics
+
+
 def create_progress_bar(dataset_files: list, len_dataset_files: int):
     """
     Create a progress bar for the conversion process.
