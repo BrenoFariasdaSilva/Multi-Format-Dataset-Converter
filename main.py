@@ -99,6 +99,36 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def has_enough_space_for_path(path, required_bytes):
+    """
+    Verify whether the filesystem containing the specified path has at least
+    the required number of free bytes.
+
+    :param path: Path where free space must be evaluated.
+    :param required_bytes: Minimum number of bytes required.
+    :return: True if there is enough free space, otherwise False.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        parent = os.path.dirname(path) or "."  # Determine the directory to inspect
+
+        verbose_output(
+            f"{BackgroundColors.GREEN}Evaluating free space for: {BackgroundColors.CYAN}{parent}{Style.RESET_ALL}"
+        )  # Output verbose message
+
+        free = get_free_space_bytes(parent)  # Retrieve free space
+        free_str = format_size_units(free)  # Format free space
+        req_str = format_size_units(required_bytes)  # Format required space
+        verbose_output(
+            f"{BackgroundColors.GREEN}Free space: {BackgroundColors.CYAN}{free_str}{BackgroundColors.GREEN}; required: {BackgroundColors.CYAN}{req_str}{Style.RESET_ALL}"
+        )  # Log details
+
+        return free >= required_bytes  # Return comparison result
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def ensure_enough_space(path, required_bytes):
     """
     Ensure that the filesystem has enough space to write the required number of bytes.
