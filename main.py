@@ -99,6 +99,23 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def load_csv_file(input_path):
+    """
+    Load a CSV file into a pandas DataFrame.
+
+    :param input_path: Path to the CSV file.
+    :return: pandas DataFrame containing the loaded dataset.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        df = pd.read_csv(input_path, low_memory=DEFAULTS.get("dataset_converter", {}).get("low_memory", False))  # Load the CSV file
+        df.columns = df.columns.str.strip()  # Remove leading/trailing whitespace from column names
+        return df  # Return the DataFrame
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def load_parquet_file(input_path):
     """
     Load a Parquet file into a pandas DataFrame.
