@@ -99,6 +99,23 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def prepare_processing_context(context: dict) -> tuple:
+    """
+    Prepare common processing context values.
+
+    :param context: Processing context dictionary with runtime values.
+    :return: Tuple containing (cfg, input_directory, output_directory).
+    """
+
+    try:  # Wrap function logic to ensure production-safe monitoring
+        cfg = context.get("cfg", {})  # Retrieve configuration section from context for processing
+        input_directory, output_directory = prepare_input_context(context, cfg)  # Prepare input and output directories for processing
+        return cfg, input_directory, output_directory  # Return prepared context values
+    except Exception as e:  # Catch exceptions inside function
+        print(str(e))  # Print function exception to terminal for logs
+        raise  # Re-raise to preserve failure semantics
+
+
 def get_and_verify_dataset_files(input_directory: str, cfg: dict) -> tuple:
     """
     Gather dataset files and verify non-empty, printing message on empty.
