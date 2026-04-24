@@ -99,6 +99,22 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def load_parquet_file(input_path):
+    """
+    Load a Parquet file into a pandas DataFrame.
+
+    :param input_path: Path to the Parquet file.
+    :return: pandas DataFrame loaded from the Parquet file.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        pf = ParquetFile(input_path)  # Load the Parquet file using fastparquet
+        return pf.to_pandas()  # Convert the Parquet file to a pandas DataFrame
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def load_txt_file(input_path):
     """
     Load a TXT file into a pandas DataFrame, assuming tab-separated values.
