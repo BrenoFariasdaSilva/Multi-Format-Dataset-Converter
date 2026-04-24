@@ -99,6 +99,26 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def gather_dataset_files(input_directory: str) -> tuple:
+    """
+    Gather dataset files from the input directory and return them with count.
+
+    :param input_directory: Path to the input directory to scan for datasets.
+    :return: Tuple containing (dataset_files_list, len_dataset_files).
+    """
+
+    dataset_files = resolve_dataset_files(input_directory)  # Get all dataset files from the input directory
+
+    try:  # Attempt to sort files case-insensitively for better user experience on case-insensitive file systems
+        dataset_files = sorted(dataset_files, key=lambda p: str(p).lower())  # Sort files case-insensitively by their string representation for consistent ordering across platforms
+    except Exception:  # Fallback to regular sorting if case-insensitive sorting fails for any reason
+        dataset_files = sorted(dataset_files, key=lambda p: str(p))  # Sort files using regular string representation as a fallback
+
+    len_dataset_files = len(dataset_files)  # Get the number of dataset files found
+    
+    return dataset_files, len_dataset_files  # Return both the list and its length
+
+
 def process_single_input_file(idx: int, params: dict) -> None:
     """
     Process a single input file: clean, load and convert to requested formats.
