@@ -99,6 +99,31 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def load_arff_file(input_path):
+    """
+    Load an ARFF file, trying scipy first and falling back to liac-arff if needed.
+
+    :param input_path: Path to the ARFF file.
+    :return: pandas DataFrame loaded from the ARFF file.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        try:  # Try loading using scipy
+            return load_arff_with_scipy(input_path)
+        except Exception as e:  # If scipy fails, warn and try liac-arff
+            verbose_output(
+                f"{BackgroundColors.YELLOW}Warning: Failed to load ARFF with scipy ({e}). Trying with liac-arff...{Style.RESET_ALL}"
+            )
+
+            try:  # Try loading using liac-arff
+                return load_arff_with_liac(input_path)
+            except Exception as e2:  # If both fail, raise an error
+                raise RuntimeError(f"Failed to load ARFF file with both scipy and liac-arff: {e2}")
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def load_csv_file(input_path):
     """
     Load a CSV file into a pandas DataFrame.
