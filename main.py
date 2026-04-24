@@ -99,6 +99,30 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def write_cleaned_lines_to_file(cleaned_path, cleaned_lines):
+    """
+    Writes cleaned lines to a specified file.
+
+    :param cleaned_path: Path to the file where cleaned lines will be written.
+    :param cleaned_lines: List of cleaned lines to write to the file.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        cleaned_path = os.path.abspath(os.path.normpath(cleaned_path))  # Normalize and absolutize the cleaned file path
+        parent_dir = os.path.dirname(cleaned_path)  # Compute parent directory for the cleaned file path
+        if parent_dir and not verify_filepath_exists(parent_dir):  # Verify parent directory existence before any write
+            os.makedirs(parent_dir, exist_ok=True)  # Create parent directory immediately before first write using exist_ok
+        required_bytes = estimate_bytes_for_lines(cleaned_lines)  # Estimate bytes needed for cleaned lines
+        ensure_enough_space(cleaned_path, required_bytes)  # Ensure enough space to write the cleaned file using same path
+
+        with open(cleaned_path, "w", encoding="utf-8") as f:  # Open the cleaned file path for writing using normalized path
+            f.writelines(cleaned_lines)  # Write all cleaned lines to the output file
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def clean_pcap_file(input_path: str, cleaned_path: str) -> None:
     """
     Copy a PCAP binary file to the cleaned path without textual modification.
