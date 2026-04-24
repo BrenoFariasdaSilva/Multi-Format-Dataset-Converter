@@ -99,6 +99,30 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def create_directories(directory_name):
+    """
+    Creates a directory if it does not exist.
+
+    :param directory_name: Name of the directory to be created.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        if not directory_name:  # Empty string or None
+            print(f"{BackgroundColors.YELLOW}Warning: create_directories called with empty path; skipping{Style.RESET_ALL}")
+            return  # Skip when no valid directory name provided
+
+        verbose_output(
+            f"{BackgroundColors.GREEN}Creating directory: {BackgroundColors.CYAN}{directory_name}{Style.RESET_ALL}"
+        )  # Output the verbose message
+
+        if not verify_filepath_exists(directory_name):  # If the directory does not exist
+            os.makedirs(directory_name, exist_ok=True)  # Create the directory using exist_ok to avoid race conditions
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def get_dataset_files(directory=None):
     """
     Get all dataset files in the specified directory and its subdirectories.
