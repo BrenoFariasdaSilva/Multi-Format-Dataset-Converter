@@ -99,6 +99,26 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def ensure_enough_space(path, required_bytes):
+    """
+    Ensure that the filesystem has enough space to write the required number of bytes.
+
+    :param path: Destination file path to verify.
+    :param required_bytes: Number of bytes required for writing.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        if not has_enough_space_for_path(path, required_bytes):  # Verify free space for the write operation
+            free = get_free_space_bytes(os.path.dirname(path) or ".")
+            raise OSError(
+                f"Not enough disk space to write {path}. Free: {format_size_units(free)}; required: {format_size_units(required_bytes)}"
+            )
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def estimate_bytes_arff(df, overhead, attributes):
     """
     Estimate required bytes for ARFF output by serializing to an in-memory buffer.
