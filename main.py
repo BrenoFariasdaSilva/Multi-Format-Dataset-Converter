@@ -99,6 +99,25 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def create_destination_if_missing(dest_dir: str, dir_created: bool) -> bool:
+    """
+    Ensure destination directory exists; create lazily before first write.
+
+    :param dest_dir: Destination directory path string.
+    :param dir_created: Boolean flag indicating whether directory already exists.
+    :return: Updated boolean flag indicating directory existence.
+    """
+
+    try:  # Enter guarded execution block to handle exceptions
+        if not dir_created:  # Verify destination directory is missing before creation
+            create_directories(dest_dir)  # Create destination directory lazily
+            dir_created = True  # Mark destination as created to avoid redundant creation attempts
+        return dir_created  # Return updated flag indicating directory existence
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def perform_conversions(df, formats_list: Optional[list], dest_dir: Optional[str], name: Optional[str]) -> None:
     """
     Convert a DataFrame into the requested output formats and save to destination directory.
