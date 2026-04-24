@@ -99,6 +99,50 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def extract_input_paths_from_datasets(dmap: dict) -> list:  # Define a nested function to extract candidate paths
+    """
+    Extract input path candidates from datasets mapping.
+
+    :param dmap: Datasets mapping from configuration.
+    :return: List of candidate input path strings.
+    """
+
+    try:  # Wrap function logic to ensure production-safe monitoring
+        if not dmap or not isinstance(dmap, dict):  # Verify mapping is a dict
+            return []  # Return empty list when mapping is missing or invalid
+        candidates = []  # Initialize list of candidate paths
+        
+        for key in sorted(dmap.keys()):  # Iterate deterministically over mapping keys
+            val = dmap.get(key)  # Retrieve the mapping value for the current key
+            if isinstance(val, str):  # If the mapping value is a string path
+                cleaned = val.strip() if isinstance(val, str) else val  # Strip surrounding whitespace from the path
+                if cleaned:  # Only add non-empty cleaned paths
+                    candidates.append(cleaned)  # Add the cleaned string path to candidates
+            elif isinstance(val, (list, tuple)):  # If the mapping value is a list/tuple of paths
+                for p in val:  # Iterate each candidate path in the sequence
+                    cleaned = p.strip() if isinstance(p, str) else p  # Strip surrounding whitespace from each candidate
+                    if cleaned:  # Only add non-empty cleaned candidates
+                        candidates.append(cleaned)  # Add the cleaned candidate to list
+            elif isinstance(val, dict):  # If the mapping value is a nested dict
+                single = val.get("path") or val.get("input")  # Extract a single path candidate from known keys
+                if isinstance(single, str):  # If the single candidate is a string
+                    cleaned = single.strip()  # Strip surrounding whitespace from the single candidate
+                    if cleaned:  # Only add non-empty cleaned single candidate
+                        candidates.append(cleaned)  # Add the single candidate to the list
+                multi = val.get("paths") or val.get("inputs")  # Extract multi-paths from known keys
+
+                if isinstance(multi, (list, tuple)):  # If multi-paths is a sequence
+                    for candidate in multi:  # Iterate provided multi-path entries
+                        cleaned = candidate.strip() if isinstance(candidate, str) else candidate  # Strip whitespace from each multi candidate
+                        if cleaned:  # Only add non-empty cleaned entries
+                            candidates.append(cleaned)  # Append each cleaned candidate to the list
+        
+        return candidates  # Return collected candidate paths
+    except Exception as e:  # Catch exceptions inside function
+        print(str(e))  # Print function exception to terminal for logs
+        raise  # Re-raise to preserve failure semantics
+
+
 def validate_and_prepare_input_paths(paths: list) -> list:  # Define a nested function to validate and create inputs
     """
     Validate candidate input paths and ensure directories exist.
