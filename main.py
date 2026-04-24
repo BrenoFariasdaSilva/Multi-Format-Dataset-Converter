@@ -869,4 +869,8 @@ if __name__ == "__main__":
 	:return: None
 	"""
 
-	main()  # Call the main function
+	try:  # Protect main execution to ensure errors are reported and notified
+		main()  # Call the main function
+	except Exception as e:  # Catch any unhandled exception from main
+		print(str(e))  # Print the exception message to terminal for logs
+		raise  # Re-raise to avoid silent failure and preserve original crash behavior
