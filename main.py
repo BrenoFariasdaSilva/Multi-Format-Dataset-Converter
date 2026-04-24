@@ -99,6 +99,22 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def estimate_bytes_from_lines(lines, overhead):
+    """
+    Estimate required bytes for plain-text lines (UTF-8 encoded).
+
+    :param lines: List of text lines.
+    :param overhead: Additional bytes for headers/metadata.
+    :return: Integer number of required bytes.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        return max(1024, sum(len((ln or "").encode("utf-8")) for ln in lines) + overhead)  # Estimate byte size
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def clean_parquet_file(input_path, cleaned_path):
     """
     Cleans Parquet files by rewriting them without any textual cleaning,
