@@ -99,6 +99,50 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def clean_file(input_path, cleaned_path):
+    """
+    Cleans ARFF, TXT, CSV, and Parquet files by removing unnecessary spaces in
+    comma-separated values or domains. For Parquet files, it rewrites the file
+    directly without textual cleaning.
+
+    :param input_path: Path to the input file (.arff, .txt, .csv, .parquet).
+    :param cleaned_path: Path to save the cleaned file.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        file_extension = os.path.splitext(input_path)[1].lower()  # Get the file extension of the input file
+
+        verbose_output(
+            f"{BackgroundColors.GREEN}Cleaning file: {BackgroundColors.CYAN}{input_path}{BackgroundColors.GREEN} and saving to {BackgroundColors.CYAN}{cleaned_path}{Style.RESET_ALL}"
+        )  # Output the verbose message
+
+        if file_extension == ".parquet":  # Handle parquet files separately (binary format)
+            clean_parquet_file(input_path, cleaned_path)  # Clean parquet file
+            return  # Exit early after handling parquet
+
+        if file_extension == ".pcap":  # Handle PCAP binary files by copying without textual modification
+            clean_pcap_file(input_path, cleaned_path)  # Copy PCAP file to cleaned path without modification
+            return  # Exit early after handling pcap
+
+        with open(input_path, "r", encoding="utf-8") as f:  # Open the input file for reading
+            lines = f.readlines()  # Read all lines from the file
+
+        if file_extension == ".arff":  # Cleaning logic for ARFF files
+            cleaned_lines = clean_arff_lines(lines)  # Clean ARFF lines
+        elif file_extension in [".txt", ".csv", ".stats"]:  # Cleaning logic for TXT, CSV, and stats files
+            cleaned_lines = clean_csv_or_txt_lines(lines)  # Clean TXT, CSV, and stats lines
+        else:  # If the file extension is not supported
+            raise ValueError(
+                f"{BackgroundColors.RED}Unsupported file extension: {BackgroundColors.CYAN}{file_extension}{Style.RESET_ALL}"
+            )  # Raise error for unsupported formats
+
+        write_cleaned_lines_to_file(cleaned_path, cleaned_lines)  # Write cleaned lines to the cleaned file path
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def load_arff_with_scipy(input_path):
     """
     Attempt to load an ARFF file using scipy. Decodes byte strings when necessary.
