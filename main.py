@@ -99,6 +99,63 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def process_single_input_file(idx: int, params: dict) -> None:
+    """
+    Process a single input file: clean, load and convert to requested formats.
+
+    :param idx: Index of the file in the current processing batch.
+    :param params: Dictionary with keys: input_path, input_directory, output_directory, formats_list, len_dataset_files, pbar.
+    :return: None
+    """
+
+    try:  # Wrap per-file logic to ensure production-safe monitoring
+        input_path = params.get("input_path")  # Extract input_path from params for this file
+        input_directory = params.get("input_directory")  # Extract input_directory from params for relative pathing
+        output_directory = params.get("output_directory")  # Extract output_directory from params for writing outputs
+        formats_list = params.get("formats_list")  # Extract formats_list from params to know desired outputs
+        len_dataset_files = params.get("len_dataset_files")  # Extract total count for progress messages
+        pbar = params.get("pbar")  # Extract progress bar instance for updates
+
+        file = os.path.basename(str(input_path))  # Extract the file name from the full path
+        name, ext = os.path.splitext(file)  # Split file name into base name and extension
+        ext = ext.lower()  # Normalize extension to lowercase for matching
+
+        formats_list = resolve_formats(formats_list) if formats_list is not None else []  # Normalize formats_list to a list when possible
+        formats_list = resolve_output_file_formats(formats_list)  # Apply configured output_file_formats override when present
+        orig_format = ext.lstrip('.')  # Compute original extension without leading dot for native-skip logic
+
+        if orig_format in formats_list:  # Verify whether native format is included in requested targets
+            formats_list = [f for f in formats_list if f != orig_format]  # Remove native format to avoid rewriting original file
+
+        update_progress_description(pbar, input_path)  # Update progress bar description using function
+
+        if not is_supported_extension(ext):  # Verify the file has an allowed input format extension before further work
+            return  # Return early to the caller when unsupported extension
+
+        dest_dir = resolve_destination_directory(input_directory, input_path, output_directory)  # Determine destination directory for converted files
+        dest_dir = os.path.abspath(os.path.normpath(str(dest_dir)))  # Normalize and convert destination directory to absolute path to avoid inconsistencies
+
+        needed_targets = []  # Initialize list for target formats that must be created for this file
+        for fmt in formats_list:  # Iterate requested formats to verify if outputs already exist
+            target_path = os.path.join(dest_dir, f"{name}.{fmt}")  # Build expected target path for each candidate format using normalized dest_dir
+            if not verify_filepath_exists(target_path):  # Verify if the specific target file is missing on disk using normalized path
+                needed_targets.append(fmt)  # Add format to needed_targets when output file does not exist
+
+        if not needed_targets:  # Verify whether any output formats actually need to be generated
+            return  # Return early when file is already standardized and no conversion is required
+
+        dir_created = create_destination_if_missing(dest_dir, verify_filepath_exists(dest_dir))  # Verify and create destination directory lazily then update flag using normalized path
+        cleaned_path = os.path.join(dest_dir, f"{name}{ext}")  # Path for saving the cleaned file prior to conversion using normalized dest_dir
+        clean_file(input_path, cleaned_path)  # Clean the file before conversion to normalize content
+
+        df = load_dataset(cleaned_path)  # Load the cleaned dataset into a DataFrame for conversion now that conversion is required
+
+        perform_conversions(df, needed_targets, dest_dir, name)  # Perform only the conversions that were detected as necessary
+    except Exception as e:  # Catch any exception to ensure logging for per-file failures
+        print(str(e))  # Print error to terminal for server logs in case of per-file failure when per-file failure occurs
+        raise  # Re-raise to preserve original failure semantics for upstream handling
+
+
 def compute_file_size_str(path: str) -> str:
     """
     Return formatted file size in GB.
