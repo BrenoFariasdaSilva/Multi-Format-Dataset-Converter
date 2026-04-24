@@ -99,6 +99,35 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def get_free_space_bytes(path):
+    """
+    Return the number of free bytes available on the filesystem
+    containing the specified path.
+
+    :param path: File or directory path to inspect.
+    :return: Free space in bytes.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        target = path if os.path.isdir(path) else os.path.dirname(path) or "."  # Resolve target directory
+
+        verbose_output(
+            f"{BackgroundColors.GREEN}Verifying free space at: {BackgroundColors.CYAN}{target}{Style.RESET_ALL}"
+        )  # Output verbose message
+
+        try:  # Try to retrieve disk usage
+            usage = shutil.disk_usage(target)  # Get disk usage statistics
+            return usage.free  # Return free space
+        except Exception as e:  # Catch any errors
+            verbose_output(
+                f"{BackgroundColors.RED}Failed to retrieve disk usage for {target}: {e}{Style.RESET_ALL}"
+            )  # Log error
+            return 0  # Fallback to zero
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def format_size_units(size_bytes):
     """
     Format a byte size into a human-readable string with appropriate units.
