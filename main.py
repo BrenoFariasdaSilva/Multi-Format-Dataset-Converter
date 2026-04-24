@@ -99,6 +99,25 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def verbose_output(true_string="", false_string=""):
+    """
+    Outputs a message if the VERBOSE constant is set to True.
+
+    :param true_string: The string to be outputted if the VERBOSE constant is set to True.
+    :param false_string: The string to be outputted if the VERBOSE constant is set to False.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        if VERBOSE and true_string != "":  # If VERBOSE is True and a true_string was provided
+            print(true_string)  # Output the true statement string
+        elif false_string != "":  # If a false_string was provided
+            print(false_string)  # Output the false statement string
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def parse_cli_arguments():
     """
     Parse command-line arguments for the dataset converter.
