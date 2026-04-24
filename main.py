@@ -99,6 +99,26 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def load_config_file(path: str = "config.yaml") -> dict:  # Load YAML config if exists
+    """
+    Load configuration from YAML file if present.
+
+    :param path: Path to YAML file.
+    :return: Loaded configuration dictionary or empty dict.
+    """
+
+    try:  # Wrap file loading to report errors and fallback gracefully
+        if verify_filepath_exists(path):  # Verify path existence
+            with open(path, "r", encoding="utf-8") as fh:  # Open file for reading
+                data = yaml.safe_load(fh) or {}  # Parse YAML safely
+                return data  # Return parsed config
+    except Exception as e:  # On error, log then return empty dict
+        print(str(e))  # Print error to terminal for server logs
+        return {}  # Return empty dict on error
+
+    return {}  # Default empty dict when file not found
+
+
 def initialize_defaults() -> None:
     """
     Initialize DEFAULTS by loading defaults and merging with config.yaml.
