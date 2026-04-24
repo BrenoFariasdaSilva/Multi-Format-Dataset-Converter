@@ -99,6 +99,40 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def resolve_low_memory(cli_args: "argparse.Namespace", config: dict) -> bool:
+    """
+    Resolve final low_memory flag using CLI arguments and configuration.
+
+    :param cli_args: Parsed CLI arguments.
+    :param config: Loaded configuration dictionary.
+    :return: Final low_memory boolean value.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        cli_low = bool(getattr(cli_args, "low_memory", False))  # Verify if --low-memory flag was provided in CLI arguments
+        cli_no_low = bool(getattr(cli_args, "no_low_memory", False))  # Verify if --no-low-memory flag was provided in CLI arguments
+
+        if cli_low and cli_no_low:  # If both flags are provided, this is a conflict that cannot be resolved
+            raise ValueError("Conflicting CLI options: --low-memory and --no-low-memory were both provided")  # Report the conflict as an error
+
+        if cli_low:  # If --low-memory flag was provided, it takes precedence and enables low memory mode
+            return True  # Return True to enable low memory mode when --low-memory is specified in CLI arguments
+        if cli_no_low:  # If --no-low-memory flag was provided, it takes precedence and disables low memory mode
+            return False  # Return False to disable low memory mode when --no-low-memory is specified in CLI arguments
+
+        try:  # If no CLI flags were provided, attempt to resolve low_memory from the configuration file
+            cfg_section = config.get("dataset_converter", {}) if isinstance(config, dict) else {}  # Safely access the dataset_converter section of the configuration
+            cfg_value = cfg_section.get("low_memory")  # Attempt to retrieve the low_memory setting from the configuration
+            if isinstance(cfg_value, bool):  # If the retrieved configuration value is a boolean, return it directly
+                return cfg_value  # Return the boolean value from the configuration if it is already a boolean
+        except Exception:  # If there is any issue accessing the configuration or the expected keys, we will catch the exception and fall back to the default behavior without crashing
+            pass  # Silently ignore configuration access issues and fall back to default behavior
+
+        return False  # Default to False (disable low memory mode) when no CLI flags are provided and configuration does not specify a valid boolean value for low_memory
+    except Exception:  # Catch any exception to ensure logging, then re-raise to preserve failure semantics
+        raise  # Re-raise the exception to preserve original failure semantics
+
+
 def resolve_entry_with_trailing_space(current_path: str, entry: str, stripped_part: str) -> str:
     """
     Resolve and optionally rename a directory entry with trailing spaces.
