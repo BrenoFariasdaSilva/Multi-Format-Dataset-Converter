@@ -99,6 +99,35 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def to_seconds(obj):
+    """
+    Converts various time-like objects to seconds.
+    
+    :param obj: The object to convert (can be int, float, timedelta, datetime, etc.)
+    :return: The equivalent time in seconds as a float, or None if conversion fails
+    """
+    
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        if obj is None:  # None can't be converted
+            return None  # Signal failure to convert
+        if isinstance(obj, (int, float)):  # Already numeric (seconds or timestamp)
+            return float(obj)  # Return as float seconds
+        if hasattr(obj, "total_seconds"):  # Timedelta-like objects
+            try:  # Attempt to call total_seconds()
+                return float(obj.total_seconds())  # Use the total_seconds() method
+            except Exception:
+                pass  # Fallthrough on error
+        if hasattr(obj, "timestamp"):  # Datetime-like objects
+            try:  # Attempt to call timestamp()
+                return float(obj.timestamp())  # Use timestamp() to get seconds since epoch
+            except Exception:
+                pass  # Fallthrough on error
+        return None  # Couldn't convert
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def calculate_execution_time(start_time, finish_time=None):
     """
     Calculate the execution time and return a human-readable string.
