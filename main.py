@@ -99,6 +99,76 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def get_dataset_files(directory=None):
+    """
+    Get all dataset files in the specified directory and its subdirectories.
+
+    :param directory: Path to the directory to search for dataset files.
+    :return: List of paths to dataset files.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        verbose_output(
+            f"{BackgroundColors.GREEN}Searching for dataset files in: {BackgroundColors.CYAN}{directory}{Style.RESET_ALL}"
+        )  # Output the verbose message
+
+        dataset_files = []  # List to store discovered dataset file paths
+        cfg = DEFAULTS.get("dataset_converter", {}) if DEFAULTS else {}  # Get dataset_converter settings from DEFAULTS
+        ignore_list = cfg.get(
+            "ignore_dirs",
+            [
+                "Classifiers",
+                "Classifiers_Hyperparameters",
+                "Converted",
+                "Data_Separability",
+                "Dataset_Description",
+                "Feature_Analysis",
+                "Results",
+            ],
+        )  # Get ignore directories list from configuration (default expanded)
+
+        ignore_files = cfg.get("ignore_files", ["results", "summary"]) or ["results", "summary"]  # Get ignore filename substrings from configuration (default to ["results", "summary"])
+        input_fmts = resolve_input_file_formats(None)  # Resolve allowed input formats from configuration for discovery
+        allowed_exts = {"." + str(f).lower().lstrip(".") for f in input_fmts}  # Build allowed extensions set from input formats
+        
+        if directory:  # If a specific directory argument provided
+            roots = [directory]  # Use the provided directory as single root to scan
+        else:  # If no directory argument provided
+            datasets_map = cfg.get("datasets", {})  # Retrieve datasets mapping from configuration
+            roots = []  # Initialize roots list for scanning
+            
+            for v in datasets_map.values():  # Iterate over dataset groups in mapping
+                if isinstance(v, (list, tuple)):  # If mapping value is a list of paths
+                    for candidate in v:  # Iterate candidate paths inside list
+                        roots.append(candidate)  # Add candidate path to roots list
+                elif isinstance(v, str):  # If mapping value is a single path string
+                    roots.append(v)  # Add single path to roots list
+        
+        for root in roots:  # Iterate roots to walk through filesystem
+            if not root:  # If root is empty string or None
+                continue  # Skip empty root entries safely
+            
+            for dirpath, dirs, files in os.walk(root):  # Walk the directory tree starting at root
+                if any(ignore_word.lower() in dirpath.lower() for ignore_word in ignore_list):  # If the current path contains ignored directory names
+                    continue  # Skip ignored directories
+                for file in files:  # Iterate files in the current directory
+                    lower_filename = file.lower()  # Lowercase filename for case-insensitive comparison
+                    if any(ignore_sub.lower() in lower_filename for ignore_sub in ignore_files):  # If the filename contains any of the ignored substrings
+                        continue  # Skip files that match ignore patterns
+                    if os.path.splitext(file)[1].lower() in allowed_exts:  # Verify if the file has an allowed input format extension
+                        dataset_files.append(os.path.join(dirpath, file))  # Append full file path to results list
+        
+        try:  # Sort the discovered dataset files alphabetically in a case-insensitive manner for deterministic order
+            dataset_files = sorted(dataset_files, key=lambda p: str(p).lower())  # Sort paths case-insensitively
+        except Exception:  # If case-insensitive sorting fails for any reason, fall back to regular sorting
+            dataset_files = sorted(dataset_files, key=lambda p: str(p))  # Sort paths with default string comparison
+
+        return dataset_files  # Return collected dataset file paths
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def scan_top_level_for_supported_files(input_directory: str) -> list:
     """
     Scan the directory itself for supported extensions.
