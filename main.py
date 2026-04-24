@@ -99,6 +99,42 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def convert_to_txt(df, output_path):
+    """
+    Convert a pandas DataFrame to TXT format and save it to the specified output path.
+
+    :param df: pandas DataFrame to be converted.
+    :param output_path: Path to save the converted TXT file.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        verbose_output(
+            f"{BackgroundColors.GREEN}Converting DataFrame to TXT format and saving to: {BackgroundColors.CYAN}{output_path}{Style.RESET_ALL}"
+        )  # Output the verbose message
+
+        try:  # Try to estimate size by dumping to a string buffer
+            buf = io.StringIO()  # Create an in-memory string buffer
+            df.to_csv(buf, sep="\t", index=False)  # Dump DataFrame to TXT in the buffer using tab as separator
+            lines = buf.getvalue().splitlines()  # Get lines from the buffer
+        except Exception:  # Fallback if dumping fails
+            lines = None  # Set lines to None to use memory usage estimation
+
+        if lines is not None:  # If lines were successfully obtained
+            bytes_needed = estimate_bytes_from_lines(lines, overhead=512)  # Estimate size based on lines
+        else:  # Fallback to memory usage estimation
+            bytes_needed = estimate_bytes_parquet(df)  # Estimate size based on DataFrame memory usage
+
+        ensure_enough_space(output_path, bytes_needed)  # Ensure enough space to write the TXT file
+
+        df.to_csv(
+            output_path, sep="\t", index=False
+        )  # Save the DataFrame to the specified output path in TXT format, using tab as the separator and without the index
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def resolve_datasets_cfg(cfg: dict) -> dict:
     """
     Resolve datasets mapping from configuration.
