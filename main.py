@@ -99,6 +99,58 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def normalize_dataframe_types(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Normalize DataFrame column types to ensure homogeneous, PyArrow-compatible types.
+
+    :param df: pandas DataFrame to normalize.
+    :return: pandas DataFrame with enforced homogeneous column types.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        if df is None:  # If DataFrame is None
+            return df  # Return as-is when there is no DataFrame to normalize
+
+        for col in list(df.columns):  # Iterate over a static list of columns to avoid mutation issues
+            series = df[col]  # Extract the column series for inspection and transformation
+
+            try:  # Attempt to decode any bytes-like entries in this column
+                if series.map(lambda x: isinstance(x, (bytes, bytearray))).any():  # If any bytes-like objects present
+                    series = series.map(lambda x: x.decode("utf-8", errors="replace") if isinstance(x, (bytes, bytearray)) else x)  # Decode bytes while preserving non-bytes
+            except Exception:  # If decoding attempt fails for unexpected reasons
+                series = series.map(lambda x: x.decode("utf-8", errors="replace") if isinstance(x, (bytes, bytearray)) else x)  # Best-effort decode fallback
+
+            non_null = series[~series.isna()]  # Slice non-null values for type inspection
+
+            if non_null.empty:  # If column contains only nulls
+                df[col] = series  # Preserve column as-is when empty of values
+                continue  # Move to next column when nothing to infer
+
+            types = set(type(v) for v in non_null.tolist())  # Collect concrete Python types present in the column
+
+            if all(t in (int, float, np.integer, np.floating) for t in types):  # Numeric-only column detected
+                df[col] = pd.to_numeric(series, errors="coerce")  # Coerce entire column to numeric, preserving NaN for invalid entries
+                continue  # Column normalized to numeric, continue to next
+
+            if all(t is bool for t in types):  # Boolean-only column detected
+                try:  # Attempt to cast to pandas nullable boolean dtype
+                    df[col] = series.astype("boolean")  # Use pandas nullable boolean to preserve NaN
+                except Exception:  # Fallback when astype fails due to unexpected values
+                    df[col] = series.map(lambda x: True if x else False)  # Best-effort boolean coercion
+                continue  # Move to next column after boolean handling
+
+            if all(t is str for t in types):  # String-only column detected
+                df[col] = series.map(lambda x: np.nan if pd.isna(x) else str(x))  # Convert non-null entries to string while preserving NaN
+                continue  # Move to next column after string normalization
+
+            df[col] = series.map(lambda x: np.nan if pd.isna(x) else str(x))  # Convert all non-null values to string while preserving NaN for mixed-type columns
+
+        return df  # Return the normalized DataFrame
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def load_pcap_stats_file(input_path: str) -> pd.DataFrame:
     """
     Load a PCAP statistics text file into a pandas DataFrame using safe multi-strategy parsing.
