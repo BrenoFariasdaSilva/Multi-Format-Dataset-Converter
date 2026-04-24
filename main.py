@@ -99,6 +99,37 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def estimate_bytes_arff(df, overhead, attributes):
+    """
+    Estimate required bytes for ARFF output by serializing to an in-memory buffer.
+
+    :param df: pandas DataFrame.
+    :param overhead: Additional bytes for headers/metadata.
+    :param attributes: List of attributes for ARFF serialization.
+    :return: Integer number of required bytes.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        try:  # Attempt ARFF serialization
+            buf = io.StringIO()  # In-memory text buffer
+
+            arff_dict = {  # Create a dictionary to hold the ARFF data
+                "description": "",  # Description of the dataset (can be left empty)
+                "relation": "converted_data",  # Name of the relation (dataset)
+                "attributes": attributes,  # List of attributes with their names and types
+                "data": df.values.tolist(),  # Convert the DataFrame values to a list of lists for ARFF data
+            }
+
+            arff.dump(arff_dict, buf)  # Dump ARFF data into the buffer
+
+            return max(1024, len(buf.getvalue().encode("utf-8")) + overhead)  # Return estimated size with overhead
+        except Exception:  # Fallback: estimate via CSV
+            return max(1024, int(df.memory_usage(deep=True).sum()))  # Estimate size based on DataFrame memory usage
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def estimate_bytes_csv(df, overhead):
     """
     Estimate required bytes to write a CSV file using an in-memory buffer.
