@@ -99,6 +99,25 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def compute_file_size_str(path: str) -> str:
+    """
+    Return formatted file size in GB.
+
+    :param path: Path to the file to measure.
+    :return: Formatted size string like "1.23 GB".
+    """
+
+    try:  # Wrap size retrieval to avoid raising and ensure safe fallback
+        if path and verify_filepath_exists(path):  # Verify the file exists before getting size
+            size_bytes = os.path.getsize(path)  # Get file size in bytes from filesystem
+            size_gb = size_bytes / (1024 ** 3)  # Convert bytes to gigabytes
+            return f"{size_gb:.2f} GB"  # Return formatted size string with two decimal places
+        else:  # When file path is empty or does not exist
+            return "0.00 GB"  # Default size string for missing file
+    except Exception:  # Fallback if os.path operations throw
+        return "0.00 GB"  # Use default size string on error
+
+
 def update_progress_description(pbar, input_path: Optional[str]) -> None:
     """
     Update the progress bar description with the relative path of the current file.
