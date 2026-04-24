@@ -99,6 +99,33 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def batch_convert(input_directory=None, output_directory=None, formats=None):
+    """
+    Batch converts dataset files from the input directory into multiple output formats
+
+    :param input_directory: Path to the input directory containing dataset files.
+    :param output_directory: Path to the output directory where converted files will be saved.
+    :param formats: List of output formats to generate (e.g., ["arff", "csv"]). If None, all formats are generated.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        verbose_output(f"{BackgroundColors.GREEN}Batch converting dataset files from {BackgroundColors.CYAN}{input_directory}{BackgroundColors.GREEN} to {BackgroundColors.CYAN}{output_directory}{Style.RESET_ALL}")  # Output the verbose message
+
+        cfg = DEFAULTS.get("dataset_converter", {}) if DEFAULTS else {}  # Get default configuration for dataset converter if available
+
+        if not input_directory:  # Verify if no input_directory argument was given
+            context = {"cfg": cfg, "output_directory": output_directory, "formats": formats}  # Build context dictionary for configured datasets processing
+            process_configured_datasets(context)  # Process datasets defined in configuration
+            return  # Completed processing configured datasets, exit early
+
+        context = {"cfg": cfg, "input_directory": input_directory, "output_directory": output_directory, "formats": formats}  # Build context dictionary for input-directory processing
+        process_input_directory(context)  # Process the explicit input directory
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def to_seconds(obj):
     """
     Converts various time-like objects to seconds.
