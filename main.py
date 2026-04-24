@@ -99,6 +99,27 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def load_pcap_dataset(input_path: str) -> pd.DataFrame:
+    """
+    Load a PCAP binary file into a pandas DataFrame using Scapy's PcapReader.
+
+    :param input_path: Path to the PCAP file to parse into a DataFrame.
+    :return: pandas DataFrame where each row represents one network packet.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        verbose_output(
+            f"{BackgroundColors.GREEN}Loading PCAP dataset from: {BackgroundColors.CYAN}{input_path}{Style.RESET_ALL}"
+        )  # Output the verbose message
+
+        df = convert_pcap_to_dataframe(input_path)  # Convert the PCAP binary file to a DataFrame using Scapy
+        df = normalize_dataframe_types(df)  # Normalize DataFrame column types to ensure homogeneous types for downstream writers
+        return df  # Return the loaded and normalized packet DataFrame
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def load_dataset(input_path):
     """
     Load a dataset from a file in CSV, ARFF, TXT, or Parquet format into a pandas DataFrame.
