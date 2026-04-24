@@ -99,6 +99,27 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def process_configured_datasets(context: dict) -> None:
+    """
+    Process datasets defined in configuration mapping.
+
+    :param context: Dictionary with processing context values.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        cfg = context.get("cfg", {})  # Retrieve configuration section from context for processing
+        datasets_cfg = resolve_datasets_cfg(cfg)  # Resolve and validate datasets mapping from config
+        if not datasets_cfg:  # Verify datasets_cfg is a mapping of dataset names to path lists
+            return  # Return immediately when configured datasets are not present or invalid
+
+        for ds_name, ds_paths in datasets_cfg.items():  # Iterate each dataset entry in configuration mapping
+            process_dataset_paths(ds_paths, context, cfg)  # Delegate per-dataset processing to function
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs in case of top-level failure for top-level failures
+        raise  # Re-raise to preserve original failure semantics for callers
+
+
 def prepare_processing_context(context: dict) -> tuple:
     """
     Prepare common processing context values.
