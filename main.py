@@ -99,6 +99,24 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def resolve_datasets_cfg(cfg: dict) -> dict:
+    """
+    Resolve datasets mapping from configuration.
+
+    :param cfg: Configuration dictionary containing dataset mappings.
+    :return: Mapping of dataset names to path lists or empty dict.
+    """
+
+    try:  # Wrap resolution logic to ensure production-safe monitoring
+        datasets_cfg = cfg.get("datasets", {})  # Retrieve the datasets mapping from configuration
+        if not isinstance(datasets_cfg, dict):  # Verify datasets_cfg is a mapping of dataset names to path lists
+            return {}  # Return an empty mapping when datasets configuration is invalid
+        return datasets_cfg  # Return the resolved datasets mapping when valid
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def process_dataset_paths(ds_paths: list, context: dict, cfg: dict) -> None:
     """
     Process configured paths for a single dataset entry.
