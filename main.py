@@ -99,6 +99,34 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def update_progress_description(pbar, input_path: Optional[str]) -> None:
+    """
+    Update the progress bar description with the relative path of the current file.
+
+    :param pbar: The tqdm progress bar instance to update.
+    :param input_path: The full path of the current input file.
+    :return: None
+    """
+
+    if pbar is None:  # Verify that a progress bar instance was provided
+        return  # Return immediately when no progress bar is available
+    try:  # Wrap path and size retrieval to avoid raising inside progress update
+        input_path_str = str(input_path) if input_path is not None else ""  # Normalize input_path to string to satisfy os.path expectations
+        rel = input_path_str  # Use the full input path string instead of computing a relative path
+        try:  # Attempt to retrieve file size in bytes safely
+            size_str = compute_file_size_str(input_path_str)  # Retrieve formatted file size string using function
+        except Exception:  # Fallback when size retrieval fails for any reason
+            size_str = "0.00 GB"  # Use default size string on error
+    except Exception:  # Fallback when unexpected errors occur during path normalization
+        input_path_str = str(input_path) if input_path is not None else ""  # Normalize input_path again in exception path
+        rel = input_path_str  # Use the full input path string in exception path as well
+        try:  # Attempt to retrieve file size in exception path
+            size_str = compute_file_size_str(input_path_str)  # Retrieve formatted file size string using function in exception path
+        except Exception:  # Fallback when size retrieval fails in exception path
+            size_str = "0.00 GB"  # Use default size string on error
+    pbar.set_description(f"{BackgroundColors.GREEN}Processing {BackgroundColors.CYAN}{rel}{BackgroundColors.GREEN} ({BackgroundColors.CYAN}{size_str}{BackgroundColors.GREEN}){Style.RESET_ALL}")  # Update the progress bar description with the input path and file size
+
+
 def is_supported_extension(ext: str) -> bool:
     """
     Verify whether the file extension is one of the allowed input dataset formats.
