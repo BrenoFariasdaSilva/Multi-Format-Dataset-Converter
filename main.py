@@ -99,6 +99,36 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def resolve_io_paths(args):
+    """
+    Resolve and validate input/output paths from CLI arguments.
+
+    :param args: Parsed CLI arguments.
+    :return: Tuple (input_path, output_path).
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        verbose_output(
+            f"{BackgroundColors.GREEN}Resolving input/output paths...{Style.RESET_ALL}"
+        )  # Output the verbose message
+
+        cfg = DEFAULTS.get("dataset_converter", {}) if DEFAULTS else {}  # Get dataset_converter config safely
+        datasets_cfg = cfg.get("datasets", {})  # Resolve datasets mapping from config
+
+        input_candidates = [args.input] if args.input else extract_input_paths_from_datasets(datasets_cfg)  # Build initial candidate list from CLI or config
+        resolved_inputs = validate_and_prepare_input_paths(input_candidates)  # Validate and prepare candidate input paths
+        out_path = resolve_output_path(args.output if hasattr(args, "output") else None, cfg)  # Resolve output path using function
+
+        if not resolved_inputs:  # If no validated input paths were found
+            print(f"{BackgroundColors.RED}No input path available from CLI or configuration datasets{Style.RESET_ALL}")  # Report missing input paths
+            return None, None  # Return failure when no inputs are available
+
+        return resolved_inputs, out_path  # Return validated input list and resolved output path
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def configure_verbose_mode(args):
     """
     Enable verbose output mode when requested via CLI.
