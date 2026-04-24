@@ -99,6 +99,30 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def load_arff_with_scipy(input_path):
+    """
+    Attempt to load an ARFF file using scipy. Decodes byte strings when necessary.
+
+    :param input_path: Path to the ARFF file.
+    :return: pandas DataFrame loaded from the ARFF file.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        data, meta = scipy_arff.loadarff(input_path)  # Load the ARFF file using scipy
+        df = pd.DataFrame(data)  # Convert the loaded data to a DataFrame
+
+        for col in df.columns:  # Iterate through each column in the DataFrame
+            if df[col].dtype == object:  # If column contains byte/string data
+                df[col] = df[col].apply(
+                    lambda x: x.decode("utf-8") if isinstance(x, bytes) else x
+                )  # Decode bytes to strings
+
+        return df  # Return the DataFrame with decoded strings
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def load_arff_with_liac(input_path):
     """
     Load an ARFF file using the liac-arff library.
