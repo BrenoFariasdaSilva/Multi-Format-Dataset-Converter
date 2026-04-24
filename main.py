@@ -99,6 +99,38 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def clean_arff_lines(lines):
+    """
+    Cleans ARFF files by removing unnecessary spaces in @attribute domain lists.
+
+    :param lines: List of lines read from the ARFF file.
+    :return: List of cleaned lines with sanitized domain values.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        cleaned_lines = []  # List to store cleaned lines
+
+        for line in lines:  # Iterate through each line of the ARFF file
+            if (
+                line.strip().lower().startswith("@attribute") and "{" in line and "}" in line
+            ):  # Verify if the line defines a domain list
+                parts = line.split("{")  # Split before domain
+                before = parts[0]  # Content before the domain
+                domain = parts[1].split("}")[0]  # Extract domain content
+                after = line.split("}")[1]  # Content after domain
+
+                cleaned_domain = ",".join([val.strip() for val in domain.split(",")])  # Strip spaces inside domain list
+                cleaned_line = f"{before}{{{cleaned_domain}}}{after}"  # Construct cleaned line
+                cleaned_lines.append(cleaned_line)  # Add cleaned attribute line
+            else:  # If the line is not an attribute definition
+                cleaned_lines.append(line)  # Keep non-attribute lines unchanged
+
+        return cleaned_lines  # Return the list of cleaned lines
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def clean_csv_or_txt_lines(lines):
     """
     Cleans TXT and CSV files by removing unnecessary spaces around comma-separated values.
