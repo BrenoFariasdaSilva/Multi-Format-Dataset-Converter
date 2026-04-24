@@ -99,6 +99,43 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def load_dataset(input_path):
+    """
+    Load a dataset from a file in CSV, ARFF, TXT, or Parquet format into a pandas DataFrame.
+
+    :param input_path: Path to the input dataset file.
+    :return: pandas DataFrame containing the dataset.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        verbose_output(
+            f"{BackgroundColors.GREEN}Loading dataset from: {BackgroundColors.CYAN}{input_path}{Style.RESET_ALL}"
+        )  # Output the verbose message
+
+        _, ext = os.path.splitext(input_path)  # Get the file extension of the input file
+        ext = ext.lower()  # Convert the file extension to lowercase
+
+        if ext == ".arff":  # If the file is in ARFF format
+            df = load_arff_file(input_path)
+        elif ext == ".csv":  # If the file is in CSV format
+            df = load_csv_file(input_path)
+        elif ext == ".parquet":  # If the file is in Parquet format
+            df = load_parquet_file(input_path)
+        elif ext == ".txt":  # If the file is in TXT format
+            df = load_txt_file(input_path)
+        elif ext == ".pcap":  # If the file is in PCAP binary format
+            df = load_pcap_dataset(input_path)
+        elif ext == ".stats":  # If the file is a PCAP statistics text file
+            df = load_pcap_stats_file(input_path)
+        else:  # Unsupported file format
+            raise ValueError(f"Unsupported file format: {ext}")
+
+        return df  # Return the loaded DataFrame
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def convert_to_arff(df, output_path):
     """
     Convert a pandas DataFrame to ARFF format and save it to the specified output path.
