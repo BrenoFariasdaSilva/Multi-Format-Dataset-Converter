@@ -99,6 +99,24 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def prepare_input_context(context: dict, cfg: dict) -> tuple:
+    """
+    Prepare input and output directory values from context and configuration.
+
+    :param context: Processing context dictionary with runtime values.
+    :param cfg: Configuration dictionary used for fallback defaults.
+    :return: Tuple containing (input_directory, output_directory).
+    """
+
+    input_directory = context.get("input_directory")  # Retrieve provided input_directory from context
+    output_directory = context.get("output_directory")  # Retrieve provided output_directory from context
+    
+    if not output_directory:  # If output directory is not provided, get it from defaults
+        output_directory = cfg.get("output_directory", "Converted")  # Default to 'Converted' when not specified
+    
+    return input_directory, output_directory  # Return prepared input and output directories
+
+
 def gather_dataset_files(input_directory: str) -> tuple:
     """
     Gather dataset files from the input directory and return them with count.
