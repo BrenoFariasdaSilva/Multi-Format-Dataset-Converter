@@ -99,6 +99,24 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def clean_pcap_file(input_path: str, cleaned_path: str) -> None:
+    """
+    Copy a PCAP binary file to the cleaned path without textual modification.
+
+    :param input_path: Path to the input PCAP binary file.
+    :param cleaned_path: Path where the copied PCAP file will be saved.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        required_bytes = os.path.getsize(input_path) if os.path.isfile(input_path) else 0  # Estimate required bytes from the source file size on disk
+        ensure_enough_space(cleaned_path, required_bytes)  # Ensure enough space to write the copied PCAP file
+        shutil.copy2(input_path, cleaned_path)  # Copy the PCAP binary file to the cleaned path preserving all metadata
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def clean_file(input_path, cleaned_path):
     """
     Cleans ARFF, TXT, CSV, and Parquet files by removing unnecessary spaces in
