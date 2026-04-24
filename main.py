@@ -99,6 +99,23 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def load_txt_file(input_path):
+    """
+    Load a TXT file into a pandas DataFrame, assuming tab-separated values.
+
+    :param input_path: Path to the TXT file.
+    :return: pandas DataFrame containing the loaded dataset.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        df = pd.read_csv(input_path, sep="\t", low_memory=DEFAULTS.get("dataset_converter", {}).get("low_memory", False))  # Load TXT file using tab separator
+        df.columns = df.columns.str.strip()  # Remove leading/trailing whitespace from column names
+        return df  # Return the DataFrame
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def extract_packet_fields(pkt) -> dict:
     """
     Extract all fields from all layers of a Scapy packet dynamically.
