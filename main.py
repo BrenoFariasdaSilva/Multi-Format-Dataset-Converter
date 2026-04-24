@@ -99,6 +99,48 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def resolve_dataset_files(input_directory):
+    """
+    Resolve dataset files from a directory or a single file path.
+
+    :param input_directory: Input directory or single file path.
+    :return: List of dataset file paths.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        if os.path.isfile(input_directory):  # If the input_directory is actually a file
+            return [input_directory]  # Return a single-item list containing the file path
+
+        files = get_dataset_files(input_directory)  # Attempt to recursively discover dataset files under the directory
+        if files:  # If recursive discovery returned any files
+            try:  # Sort the discovered files alphabetically in a case-insensitive manner for deterministic order
+                files = sorted(files, key=lambda p: str(p).lower())  # Sort paths case-insensitively
+            except Exception:  # If case-insensitive sorting fails for any reason, fall back to regular sorting
+                files = sorted(files, key=lambda p: str(p))  # Sort paths with default string comparison
+            return files  # Return discovered files immediately
+
+        direct_files = scan_top_level_for_supported_files(input_directory)  # Scan the directory itself for supported extensions
+        if direct_files:  # If direct files were found in the top-level directory
+            try:  # Sort the directly found files alphabetically in a case-insensitive manner for deterministic order
+                direct_files = sorted(direct_files, key=lambda p: str(p).lower())  # Sort paths case-insensitively
+            except Exception:  # If case-insensitive sorting fails for any reason, fall back to regular sorting
+                direct_files = sorted(direct_files, key=lambda p: str(p))  # Sort paths with default string comparison
+            return direct_files  # Return the directly found files
+
+        child_files = scan_immediate_subdirs_for_files(input_directory)  # Scan each immediate subdirectory separately to handle unusual mounts
+        if child_files:  # If any files were discovered in an immediate child directory
+            try:  # Sort the child-discovered files alphabetically in a case-insensitive manner for deterministic order
+                child_files = sorted(child_files, key=lambda p: str(p).lower())  # Sort paths case-insensitively
+            except Exception:  # If case-insensitive sorting fails for any reason, fall back to regular sorting
+                child_files = sorted(child_files, key=lambda p: str(p))  # Sort paths with default string comparison
+            return child_files  # Return the first non-empty child discovery
+
+        return []  # Return empty list when no dataset files could be located
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def resolve_formats(formats):
     """
     Normalize and validate the list of output formats.
