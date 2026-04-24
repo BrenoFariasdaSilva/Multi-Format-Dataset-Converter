@@ -99,6 +99,27 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def clean_parquet_file(input_path, cleaned_path):
+    """
+    Cleans Parquet files by rewriting them without any textual cleaning,
+
+    :param input_path: Path to the input Parquet file.
+    :param cleaned_path: Path where the rewritten Parquet file will be saved.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        df = pd.read_parquet(input_path, engine="fastparquet")  # Read parquet into DataFrame
+
+        required_bytes = estimate_bytes_parquet(df)  # Estimate bytes needed for cleaned Parquet
+        ensure_enough_space(cleaned_path, required_bytes)  # Ensure enough space to write the cleaned file
+
+        df.to_parquet(cleaned_path, index=False)  # Write DataFrame back to parquet at destination
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def clean_arff_lines(lines):
     """
     Cleans ARFF files by removing unnecessary spaces in @attribute domain lists.
