@@ -99,6 +99,26 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def estimate_bytes_for_lines(lines):
+    """
+    Estimate the number of bytes a list of text lines will occupy when
+    encoded as UTF-8.
+
+    :param lines: List of text lines to measure.
+    :return: Estimated byte size.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        verbose_output(
+            f"{BackgroundColors.GREEN}Estimating UTF-8 byte size for provided lines...{Style.RESET_ALL}"
+        )  # Output verbose message
+
+        return sum(len((ln or "").encode("utf-8")) for ln in lines)  # Compute and return byte size
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def write_cleaned_lines_to_file(cleaned_path, cleaned_lines):
     """
     Writes cleaned lines to a specified file.
