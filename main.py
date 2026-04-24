@@ -99,6 +99,33 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def convert_pcap_to_dataframe(input_path: str) -> pd.DataFrame:
+    """
+    Read a PCAP file packet by packet using Scapy and construct a pandas DataFrame.
+
+    :param input_path: Path to the PCAP binary file to parse.
+    :return: pandas DataFrame where each row represents one network packet.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        verbose_output(
+            f"{BackgroundColors.GREEN}Reading PCAP file: {BackgroundColors.CYAN}{input_path}{Style.RESET_ALL}"
+        )  # Output the verbose message
+
+        rows = []  # Initialize list to accumulate per-packet row dictionaries
+
+        with PcapReader(input_path) as reader:  # Open PcapReader in context manager for memory-efficient sequential iteration
+            for pkt in reader:  # Iterate each packet from the PCAP file one at a time
+                row = extract_packet_fields(pkt)  # Extract all layer fields from the current packet dynamically
+                rows.append(row)  # Append the extracted row dict to the accumulator list
+
+        df = pd.DataFrame(rows)  # Construct DataFrame from the accumulated list of per-packet dicts
+        return df  # Return the fully constructed packet DataFrame
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def normalize_dataframe_types(df: pd.DataFrame) -> pd.DataFrame:
     """
     Normalize DataFrame column types to ensure homogeneous, PyArrow-compatible types.
