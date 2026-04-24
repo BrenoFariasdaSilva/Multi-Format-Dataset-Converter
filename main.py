@@ -99,6 +99,41 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def convert_to_arff(df, output_path):
+    """
+    Convert a pandas DataFrame to ARFF format and save it to the specified output path.
+
+    :param df: pandas DataFrame to be converted.
+    :param output_path: Path to save the converted ARFF file.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        verbose_output(
+            f"{BackgroundColors.GREEN}Converting DataFrame to ARFF format and saving to: {BackgroundColors.CYAN}{output_path}{Style.RESET_ALL}"
+        )  # Output the verbose message
+
+        attributes = [(col, "STRING") for col in df.columns]  # Define all attributes as strings
+        df = df.astype(str)  # Ensure all values are strings
+
+        arff_dict = {  # Create a dictionary to hold the ARFF data
+            "description": "",  # Description of the dataset (can be left empty)
+            "relation": "converted_data",  # Name of the relation (dataset)
+            "attributes": attributes,  # List of attributes with their names and types
+            "data": df.values.tolist(),  # Convert the DataFrame values to a list of lists for ARFF data
+        }
+
+        bytes_needed = estimate_bytes_arff(df, 512, attributes)  # Estimate size needed for ARFF output
+
+        ensure_enough_space(output_path, bytes_needed)  # Ensure enough space to write the ARFF file
+
+        with open(output_path, "w") as f:  # Open the output file for writing
+            arff.dump(arff_dict, f)  # Dump the ARFF data into the file using liac-arff
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def convert_to_csv(df, output_path):
     """
     Convert a pandas DataFrame to CSV format and save it to the specified output path.
