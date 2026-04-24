@@ -99,6 +99,39 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def format_size_units(size_bytes):
+    """
+    Format a byte size into a human-readable string with appropriate units.
+
+    :param size_bytes: Size in bytes.
+    :return: Formatted size string.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        if size_bytes is None:  # If size_bytes is None
+            return "0 Bytes"  # Return 0 Bytes
+
+        try:  # Try to convert to float
+            size = float(size_bytes)  # Convert to float
+        except Exception:  # Catch conversion errors
+            return str(size_bytes)  # Return original value as string
+
+        for unit in ("TB", "GB", "MB", "KB"):  # Iterate through units
+            if size >= 1024**4 and unit == "TB":  # Terabytes
+                return f"{size / (1024 ** 4):.2f} TB"  # Return formatted string
+            if size >= 1024**3 and unit == "GB":  # Gigabytes
+                return f"{size / (1024 ** 3):.2f} GB"  # Return formatted string
+            if size >= 1024**2 and unit == "MB":  # Megabytes
+                return f"{size / (1024 ** 2):.2f} MB"  # Return formatted string
+            if size >= 1024**1 and unit == "KB":  # Kilobytes
+                return f"{size / 1024:.2f} KB"  # Return formatted string
+
+        return f"{int(size)} Bytes"  # Return bytes if less than 1 KB
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def has_enough_space_for_path(path, required_bytes):
     """
     Verify whether the filesystem containing the specified path has at least
