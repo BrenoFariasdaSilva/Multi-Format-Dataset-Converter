@@ -99,6 +99,24 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def create_progress_bar(dataset_files: list, len_dataset_files: int):
+    """
+    Create a progress bar for the conversion process.
+
+    :param dataset_files: List of dataset files to display in the progress bar.
+    :param len_dataset_files: Total number of dataset files for progress reporting.
+    :return: A tqdm progress bar instance.
+    """
+
+    try:  # Wrap function logic to ensure production-safe monitoring
+        bar_format_str = BackgroundColors.CYAN + "{l_bar}{bar} " + BackgroundColors.CYAN + "{percentage:3.0f}%" + Style.RESET_ALL + "{r_bar}"  # Compose bar_format with cyan percentage field
+        pbar = tqdm(dataset_files, desc=f"{BackgroundColors.CYAN}Converting {BackgroundColors.CYAN}{len_dataset_files}{BackgroundColors.GREEN} {'file' if len_dataset_files == 1 else 'files'}{Style.RESET_ALL}", unit="file", colour="green", total=len_dataset_files, leave=False, dynamic_ncols=True, bar_format=bar_format_str)  # Create a single-line progress bar for the conversion process with colored percentage
+        return pbar  # Return the created progress bar instance
+    except Exception as e:  # Catch exceptions inside function
+        print(str(e))  # Print function exception to terminal for logs
+        raise  # Re-raise to preserve failure semantics
+
+
 def iterate_and_process_with_pbar(pbar, input_directory: str, output_directory: str, formats_list: list, len_dataset_files: int) -> None:
     """
     Iterate progress bar and delegate per-file processing to the per-file function.
