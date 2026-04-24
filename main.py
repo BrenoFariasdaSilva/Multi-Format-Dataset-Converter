@@ -99,6 +99,33 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def resolve_entry_with_trailing_space(current_path: str, entry: str, stripped_part: str) -> str:
+    """
+    Resolve and optionally rename a directory entry with trailing spaces.
+
+    :param current_path: Current directory path.
+    :param entry: Directory entry name.
+    :param stripped_part: Normalized target name without surrounding spaces.
+    :return: Resolved path after optional rename.
+    """
+
+    try:  # Wrap full function logic to ensure safe execution
+        resolved = os.path.join(current_path, entry)  # Build resolved path
+
+        if entry != stripped_part:  # Verify trailing spaces exist
+            corrected = os.path.join(current_path, stripped_part)  # Build corrected path
+            try:  # Attempt to rename entry
+                os.rename(resolved, corrected)  # Rename entry to stripped version
+                verbose_output(true_string=f"{BackgroundColors.GREEN}Renamed: {BackgroundColors.CYAN}{resolved}{BackgroundColors.GREEN} -> {BackgroundColors.CYAN}{corrected}{Style.RESET_ALL}")  # Log rename
+                resolved = corrected  # Update resolved path after rename
+            except Exception:  # Handle rename failure
+                verbose_output(true_string=f"{BackgroundColors.RED}Failed to rename: {BackgroundColors.CYAN}{resolved}{Style.RESET_ALL}")  # Log failure
+
+        return resolved  # Return resolved path
+    except Exception:  # Catch unexpected errors
+        return os.path.join(current_path, entry)  # Return fallback resolved path
+
+
 def resolve_full_trailing_space_path(filepath: str) -> str:
     """
     Resolve trailing space issues across all path components.
