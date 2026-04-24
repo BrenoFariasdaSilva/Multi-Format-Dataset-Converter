@@ -99,6 +99,76 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def process_dataset_file(idx: int, len_dataset_files: int, input_path: str, effective_input: str, effective_output_base: str, formats_list: list, pbar) -> None:
+    """
+    Process a single dataset file: clean, load and convert to requested formats.
+
+    :param idx: Index of the file in the current processing batch.
+    :param len_dataset_files: Total number of files in the current batch.
+    :param input_path: Path to the input file being processed.
+    :param effective_input: Effective input directory used for relative calculations.
+    :param effective_output_base: Base output directory for converted files.
+    :param formats_list: List of output formats to generate for this file.
+    :param pbar: Progress bar instance used to display per-file progress.
+    :return: None
+    """
+
+    try:  # Wrap per-file logic to ensure production-safe monitoring
+        file = os.path.basename(str(input_path))  # Extract the file name from the full path
+        name, ext = os.path.splitext(file)  # Split file name into base name and extension
+        ext = ext.lower()  # Normalize extension to lowercase for matching
+
+        formats_list = resolve_formats(formats_list) if formats_list is not None else []  # Normalize formats_list to a list when possible
+        formats_list = resolve_output_file_formats(formats_list)  # Apply configured output_file_formats override when present
+        orig_format = ext.lstrip('.')  # Compute original extension without leading dot for native-skip logic
+
+        if orig_format in formats_list:  # Verify whether native format is included in requested targets
+            formats_list = [f for f in formats_list if f != orig_format]  # Remove native format to avoid rewriting original file
+
+        if not is_supported_extension(ext):  # Verify the file has an allowed input format extension before any further work
+            return  # Return early to the caller when unsupported extension
+
+        dest_dir = resolve_destination_directory(effective_input, input_path, effective_output_base)  # Determine destination directory preserving relative structure
+        dest_dir = os.path.abspath(os.path.normpath(str(dest_dir)))  # Normalize and convert destination directory to absolute path to avoid inconsistencies
+
+        needed_targets = []  # Initialize list of formats that actually require conversion for this file
+        for fmt in formats_list:  # Iterate requested formats to detect missing outputs
+            target_path = os.path.join(dest_dir, f"{name}.{fmt}")  # Compute full target path for candidate output format using normalized dest_dir
+            if not verify_filepath_exists(target_path):  # Verify if the target output file is missing on disk using normalized path
+                needed_targets.append(fmt)  # Append format when output file does not exist and conversion is required
+
+        if not needed_targets:  # Verify whether any conversion is required after existence verifies
+            return  # Return early when the file is already standardized and no conversions are necessary
+
+        size_str = compute_file_size_str(str(input_path))  # Retrieve formatted file size string for current input_path now that conversion is required
+
+        if pbar is not None:  # Verify progress bar instance exists before calling set_description
+            try:  # Attempt to compute a relative path for the description to show in pbar
+                rel = os.path.relpath(input_path, effective_input) if effective_input and os.path.isdir(effective_input) else os.path.basename(input_path)  # Compute relative path when possible
+            except Exception:  # Fallback to basename on error during relpath computation
+                rel = os.path.basename(input_path)  # Use basename when relpath fails for pbar description
+            pbar.set_description(f"{BackgroundColors.GREEN}Processing {BackgroundColors.CYAN}{rel}{Style.RESET_ALL}")  # Update the progress bar description with the relative path
+
+        dir_created = create_destination_if_missing(dest_dir, verify_filepath_exists(dest_dir))  # Verify and create destination directory lazily then update flag using normalized path
+        cleaned_path = os.path.join(dest_dir, f"{name}{ext}")  # Path for saving the cleaned file prior to conversion using normalized dest_dir
+        clean_file(input_path, cleaned_path)  # Clean the file before conversion to normalize content
+
+        df = load_dataset(cleaned_path)  # Load the cleaned dataset into a DataFrame for conversion now that conversion is required
+        if "arff" in needed_targets:  # If ARFF format is required for output after verifies
+            convert_to_arff(df, os.path.join(str(dest_dir), f"{name}.arff"))  # Convert and save as ARFF format
+        if "csv" in needed_targets:  # If CSV format is required for output after verifies
+            convert_to_csv(df, os.path.join(str(dest_dir), f"{name}.csv"))  # Convert and save as CSV format
+        if "parquet" in needed_targets:  # If Parquet format is required for output after verifies
+            convert_to_parquet(df, os.path.join(str(dest_dir), f"{name}.parquet"))  # Convert and save as Parquet format
+        if "txt" in needed_targets:  # If TXT format is required for output after verifies
+            convert_to_txt(df, os.path.join(str(dest_dir), f"{name}.txt"))  # Convert and save as TXT format
+
+        print()  # Print a newline for better readability between files in terminal output
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs in case of per-file failure when per-file failure occurs
+        raise  # Re-raise to preserve original failure semantics for upstream handling
+
+
 def process_configured_datasets(context: dict) -> None:
     """
     Process datasets defined in configuration mapping.
