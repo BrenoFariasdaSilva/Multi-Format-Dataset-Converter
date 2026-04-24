@@ -99,6 +99,21 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def estimate_bytes_parquet(df):
+    """
+    Estimate required bytes for Parquet output using DataFrame memory size.
+
+    :param df: pandas DataFrame.
+    :return: Integer number of required bytes.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        return max(1024, int(df.memory_usage(deep=True).sum()))  # Estimate size based on DataFrame memory usage
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def estimate_bytes_from_lines(lines, overhead):
     """
     Estimate required bytes for plain-text lines (UTF-8 encoded).
