@@ -99,6 +99,43 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def extract_packet_fields(pkt) -> dict:
+    """
+    Extract all fields from all layers of a Scapy packet dynamically.
+
+    :param pkt: A Scapy Packet instance to extract fields from.
+    :return: Dictionary with keys formatted as "LayerName.field_name".
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        row = {}  # Initialize empty row dict to accumulate this packet's field values
+
+        for layer_class in pkt.layers():  # Iterate each protocol layer class present in the packet
+            layer_name = layer_class.__name__  # Retrieve the layer class name as the column prefix
+            layer_instance = pkt.getlayer(layer_class)  # Retrieve the layer instance from the packet
+
+            if layer_instance is None:  # Verify the layer instance is present before field extraction
+                continue  # Skip missing layer instances safely
+
+            for field_name, field_value in layer_instance.fields.items():  # Iterate all fields in this layer instance
+                column_key = f"{layer_name}.{field_name}"  # Compose column key as "LayerName.field_name"
+
+                try:  # Attempt to normalize field value to a safe serializable type
+                    if isinstance(field_value, (bytes, bytearray)):  # If the value is raw bytes or bytearray
+                        row[column_key] = field_value.decode("utf-8", errors="replace")  # Decode bytes to string using utf-8 with replacement on errors
+                    elif isinstance(field_value, (int, float, bool, type(None))):  # If value is a numeric, boolean, or None
+                        row[column_key] = field_value  # Preserve numeric, boolean, and None values as-is
+                    else:  # For any other object types not directly serializable
+                        row[column_key] = str(field_value)  # Convert object to its string representation to preserve semantics
+                except Exception:  # Fallback when value conversion fails for any reason
+                    row[column_key] = None  # Assign None as safe fallback for unconvertible field values
+
+        return row  # Return the extracted field dict representing this packet as a row
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def convert_pcap_to_dataframe(input_path: str) -> pd.DataFrame:
     """
     Read a PCAP file packet by packet using Scapy and construct a pandas DataFrame.
