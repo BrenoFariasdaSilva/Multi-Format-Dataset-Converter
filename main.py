@@ -99,6 +99,24 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def resolve_output_path(arg_output: Optional[str], cfg_section: dict) -> str:
+    """
+    Resolve the output directory path from CLI argument or configuration.
+
+    :param arg_output: Output path provided via CLI.
+    :param cfg_section: The dataset_converter configuration section.
+    :return: Resolved output path string.
+    """
+
+    try:  # Wrap function logic to ensure production-safe monitoring
+        output_default = cfg_section.get("output_directory", "./Output") or "./Output"  # Determine configured default
+        out = arg_output if arg_output else output_default  # Choose CLI-provided output or fallback default; do not create directories here to keep creation lazy
+        return out  # Return the resolved output path without creating it (creation is performed lazily per-dataset)
+    except Exception as e:  # Catch exceptions inside function
+        print(str(e))  # Print function exception to terminal for logs
+        raise  # Re-raise to preserve failure semantics
+
+
 def resolve_io_paths(args):
     """
     Resolve and validate input/output paths from CLI arguments.
