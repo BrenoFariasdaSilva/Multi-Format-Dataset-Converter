@@ -99,6 +99,33 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def resolve_input_file_formats(formats_list: Optional[list]) -> list:
+    """
+    Resolve input_file_formats from configuration and return final discovery formats.
+
+    :param formats_list: The formats requested via CLI or per-call.
+    :return: The list of input formats to allow during file discovery.
+    """
+
+    try:  # Wrap resolution to avoid raising from malformed DEFAULTS
+        cfg_section = DEFAULTS.get("dataset_converter", {}) if DEFAULTS else {}  # Retrieve dataset_converter section from DEFAULTS
+        in_formats = cfg_section.get("input_file_formats", None)  # Retrieve configured input_file_formats from config
+
+        if in_formats is None:  # If configuration does not provide input_file_formats
+            return formats_list or ["arff", "csv", "parquet", "txt"]  # Return provided formats_list or all formats as default
+
+        norm = [str(file).lower() for file in (in_formats or [])]  # Normalize configured entries to lowercase strings
+        allowed = ["arff", "csv", "parquet", "pcap", "stats", "txt"]  # Allowed input formats list
+        final = [file for file in norm if file in allowed]  # Filter configured formats to allowed set
+
+        if not final:  # If no valid configured formats remain after filtering
+            return formats_list or ["arff", "csv", "parquet", "txt"]  # Fallback to all formats when config invalid or empty
+
+        return final  # Return the configured list of input formats
+    except Exception:  # Fallback on any unexpected error during resolution
+        return formats_list or ["arff", "csv", "parquet", "txt"]  # Return provided formats_list or all formats on error
+
+
 def resolve_output_file_formats(formats_list: Optional[list]) -> list:
     """
     Resolve output_file_formats from configuration and return final target formats.
