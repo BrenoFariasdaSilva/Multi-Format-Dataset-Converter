@@ -99,6 +99,31 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def convert_to_csv(df, output_path):
+    """
+    Convert a pandas DataFrame to CSV format and save it to the specified output path.
+
+    :param df: pandas DataFrame to be converted.
+    :param output_path: Path to save the converted CSV file.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        verbose_output(
+            f"{BackgroundColors.GREEN}Converting DataFrame to CSV format and saving to: {BackgroundColors.CYAN}{output_path}{Style.RESET_ALL}"
+        )  # Output the verbose message
+
+        bytes_needed = estimate_bytes_csv(df, overhead=512)  # Estimate size needed for CSV output
+        ensure_enough_space(output_path, bytes_needed)  # Ensure enough space to write the CSV file
+
+        df.to_csv(
+            output_path, index=False
+        )  # Save the DataFrame to the specified output path in CSV format, without the index
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def convert_to_parquet(df, output_path):
     """
     Convert a pandas DataFrame to PARQUET format and save it to the specified output path.
