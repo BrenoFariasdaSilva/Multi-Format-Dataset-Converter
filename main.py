@@ -99,6 +99,34 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def scan_top_level_for_supported_files(input_directory: str) -> list:
+    """
+    Scan the directory itself for supported extensions.
+
+    :param input_directory: Directory path to scan.
+    :return: List of supported files found directly under the directory.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        input_fmts = resolve_input_file_formats(None)  # Resolve allowed input formats from configuration for discovery
+        supported_exts = {"." + str(file).lower().lstrip(".") for file in input_fmts}  # Build supported extensions set from input formats
+        direct_files = []  # Container for files found directly under the directory
+        if os.path.isdir(input_directory):  # Verify the path is a directory before listing
+            for entry in os.listdir(input_directory):  # Iterate entries directly under the directory
+                candidate = os.path.join(input_directory, entry)  # Build candidate full path
+                if os.path.isfile(candidate) and os.path.splitext(entry)[1].lower() in supported_exts:  # Verify file and extension
+                    direct_files.append(candidate)  # Add matching file to direct_files
+
+        try:  # Sort the directly found files alphabetically in a case-insensitive manner for deterministic order
+            direct_files = sorted(direct_files, key=lambda p: str(p).lower())  # Sort paths case-insensitively
+        except Exception:  # If case-insensitive sorting fails for any reason, fall back to regular sorting
+            direct_files = sorted(direct_files, key=lambda p: str(p))  # Sort paths with default string comparison
+        return direct_files  # Return the directly found files (may be empty)
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def scan_immediate_subdirs_for_files(input_directory: str) -> list:
     """
     Scan each immediate subdirectory for dataset files and return first non-empty result.
