@@ -99,6 +99,34 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def get_default_config() -> dict:  # Return default configuration for dataset_converter
+    """
+    Default dataset_converter configuration.
+
+    :return: Dictionary with default configuration values.
+    """
+
+    return {
+        "dataset_converter": {
+            "verbose": False,  # Whether to enable verbose messages
+            "input_file_formats": ["arff", "csv", "parquet", "pcap", "stats", "txt"],  # Input formats to discover during dataset scanning
+            "output_file_formats": ["arff", "csv", "parquet", "txt"],  # Output formats to generate during conversion
+            "input_directory": "./Datasets/",  # Default input directory
+            "output_directory": "./Converted",  # Default output directory
+            "ignore_dirs": [
+                "Classifiers",
+                "Classifiers_Hyperparameters",
+                "Converted",
+                "Data_Separability",
+                "Dataset_Description",
+                "Feature_Analysis",
+                "Results",
+            ],  # Directories to ignore during discovery
+            "ignore_files": ["results", "summary"],  # Filename substrings to ignore
+        }
+    }
+
+
 def load_config_file(path: str = "config.yaml") -> dict:  # Load YAML config if exists
     """
     Load configuration from YAML file if present.
