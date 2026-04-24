@@ -99,6 +99,28 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def estimate_bytes_csv(df, overhead):
+    """
+    Estimate required bytes to write a CSV file using an in-memory buffer.
+
+    :param df: pandas DataFrame.
+    :param overhead: Additional bytes for headers/metadata.
+    :return: Integer number of required bytes.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        try:  # Attempt CSV serialization
+            buf = io.StringIO()  # In-memory text buffer
+            df.to_csv(buf, index=False)  # Serialize DataFrame to CSV
+            return max(1024, len(buf.getvalue().encode("utf-8")) + overhead)  # Return estimated size with overhead
+
+        except Exception:  # Fallback to memory usage
+            return max(1024, int(df.memory_usage(deep=True).sum()))  # Estimate size based on DataFrame memory usage
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def estimate_bytes_parquet(df):
     """
     Estimate required bytes for Parquet output using DataFrame memory size.
