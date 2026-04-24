@@ -99,6 +99,32 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def process_input_directory(context: dict) -> None:
+    """
+    Process a single explicit input directory for conversion.
+
+    :param context: Dictionary with processing context values.
+    :return: None
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        cfg, input_directory, output_directory = prepare_processing_context(context)  # Prepare context and directories for processing
+
+        dataset_files, len_dataset_files = get_and_verify_dataset_files(input_directory, cfg)  # Gather dataset files and verify non-empty
+        if not dataset_files:  # If no dataset files were found after verification
+            return  # Exit early when function signaled empty discovery
+
+        formats_list = resolve_formats(context.get("formats"))  # Normalize and validate output formats for the run
+        formats_list = resolve_output_file_formats(formats_list)  # Apply configured output_file_formats override when present
+
+        pbar = create_progress_bar(dataset_files, len_dataset_files)  # Create a progress bar for the conversion process
+
+        iterate_and_process_with_pbar(pbar, input_directory, output_directory, formats_list, len_dataset_files)  # Iterate and process all files using function
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs when top-level failure occurs for top-level failures
+        raise  # Re-raise to preserve original failure semantics
+
+
 def prepare_input_context(context: dict, cfg: dict) -> tuple:
     """
     Prepare input and output directory values from context and configuration.
