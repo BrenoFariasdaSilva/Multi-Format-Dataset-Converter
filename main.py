@@ -99,6 +99,29 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def scan_immediate_subdirs_for_files(input_directory: str) -> list:
+    """
+    Scan each immediate subdirectory for dataset files and return first non-empty result.
+
+    :param input_directory: Directory path whose immediate children will be scanned.
+    :return: List of dataset files found in the first child directory containing supported files.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        if not os.path.isdir(input_directory):  # Verify the input path is a directory before exploring children
+            return []  # Return empty list when input is not a directory
+        for entry in os.listdir(input_directory):  # Iterate child entries to explore subdirectories
+            child = os.path.join(input_directory, entry)  # Build child path
+            if os.path.isdir(child):  # Only consider child directories
+                child_files = get_dataset_files(child)  # Attempt recursive discovery in the child directory
+                if child_files:  # If any files were discovered in the child
+                    return child_files  # Return the first non-empty child discovery
+        return []  # Return empty list when no child directories contain dataset files
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def resolve_dataset_files(input_directory):
     """
     Resolve dataset files from a directory or a single file path.
