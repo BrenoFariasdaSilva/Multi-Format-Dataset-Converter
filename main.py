@@ -99,6 +99,27 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def resolve_formats(formats):
+    """
+    Normalize and validate the list of output formats.
+
+    :param formats: List or string of formats.
+    :return: Cleaned list of formats.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        if formats is None:  # If no specific formats were provided
+            return ["arff", "csv", "parquet", "txt"]  # Default to all supported formats
+
+        if isinstance(formats, str):  # If provided as CSV string
+            return [f.strip().lower().lstrip(".") for f in formats.split(",") if f.strip()]  # Split and clean
+
+        return [f.strip().lower().lstrip(".") for f in formats if isinstance(f, str)]  # Clean list
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def resolve_input_file_formats(formats_list: Optional[list]) -> list:
     """
     Resolve input_file_formats from configuration and return final discovery formats.
