@@ -99,6 +99,19 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def is_supported_extension(ext: str) -> bool:
+    """
+    Verify whether the file extension is one of the allowed input dataset formats.
+
+    :param ext: The file extension to evaluate (including leading dot).
+    :return: True when extension is supported, otherwise False.
+    """
+
+    input_fmts = resolve_input_file_formats(None)  # Resolve allowed input formats from configuration for discovery
+    allowed_exts = {"." + str(f).lower().lstrip(".") for f in input_fmts}  # Build allowed extensions set from input formats
+    return ext in allowed_exts  # Return True for allowed input format extensions and False otherwise
+
+
 def create_destination_if_missing(dest_dir: str, dir_created: bool) -> bool:
     """
     Ensure destination directory exists; create lazily before first write.
