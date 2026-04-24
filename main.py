@@ -99,6 +99,32 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def validate_and_prepare_input_paths(paths: list) -> list:  # Define a nested function to validate and create inputs
+    """
+    Validate candidate input paths and ensure directories exist.
+
+    :param paths: Candidate input path list.
+    :return: List of validated input paths.
+    """
+
+    try:  # Wrap function logic to ensure production-safe monitoring
+        valid = []  # Initialize list for validated existing paths
+        for p in paths:  # Iterate provided candidate paths
+            p_str = str(p).strip() if p is not None else ""  # Strip surrounding whitespace and coerce to string
+            if not p_str:  # Skip empty or None entries after cleaning
+                continue  # Continue to next candidate when value is falsy
+            if verify_filepath_exists(p_str):  # Verify candidate exists on filesystem
+                valid.append(p_str)  # Add existing cleaned path to validated list
+            else:  # If candidate does not exist, do NOT create input directories automatically
+                verbose_output(f"{BackgroundColors.YELLOW}Configured input path does not exist, skipping: {BackgroundColors.CYAN}{p_str}{Style.RESET_ALL}")  # Informative verbose message when configured input is missing
+                continue  # Skip non-existing configured input paths without creating them
+        
+        return valid  # Return the list of validated paths
+    except Exception as e:  # Catch exceptions inside function
+        print(str(e))  # Print function exception to terminal for logs
+        raise  # Re-raise to preserve failure semantics
+
+
 def resolve_output_path(arg_output: Optional[str], cfg_section: dict) -> str:
     """
     Resolve the output directory path from CLI argument or configuration.
