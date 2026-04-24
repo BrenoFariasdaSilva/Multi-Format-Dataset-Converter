@@ -99,6 +99,58 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def load_pcap_stats_file(input_path: str) -> pd.DataFrame:
+    """
+    Load a PCAP statistics text file into a pandas DataFrame using safe multi-strategy parsing.
+
+    :param input_path: Path to the PCAP statistics text file to parse.
+    :return: pandas DataFrame parsed from the statistics file content.
+    """
+
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        verbose_output(
+            f"{BackgroundColors.GREEN}Loading PCAP stats file: {BackgroundColors.CYAN}{input_path}{Style.RESET_ALL}"
+        )  # Output the verbose message
+
+        try:  # Attempt CSV-style parsing as the first strategy using auto-detected delimiter
+            df = pd.read_csv(input_path, sep=None, engine="python", low_memory=DEFAULTS.get("dataset_converter", {}).get("low_memory", False))  # Parse using Python's auto-delimiter detection
+            if not df.empty and len(df.columns) > 1:  # Verify successful multi-column parse before accepting result
+                df.columns = df.columns.str.strip()  # Strip whitespace from all column names
+                return df  # Return the DataFrame when CSV-style parse succeeds with multiple columns
+        except Exception:  # Fallback when CSV-style parsing fails or yields an unusable single-column result
+            pass  # Continue to the next parsing strategy without raising
+
+        rows = []  # Initialize list to accumulate parsed key-value row dicts
+
+        with open(input_path, "r", encoding="utf-8", errors="replace") as fh:  # Open file with error replacement to handle non-UTF-8 bytes robustly
+            for line in fh:  # Iterate each line in the stats file sequentially
+                stripped = line.strip()  # Strip surrounding whitespace from each line
+
+                if not stripped or stripped.startswith("#"):  # Skip empty lines and comment lines beginning with hash
+                    continue  # Move to the next line when line is empty or a comment
+
+                if ":" in stripped:  # Verify line contains a colon delimiter indicating a key-value pair
+                    parts = stripped.split(":", 1)  # Split on the first colon only to preserve value content intact
+                    key = parts[0].strip()  # Strip whitespace from the extracted key portion
+                    value = parts[1].strip() if len(parts) > 1 else ""  # Strip whitespace from the extracted value portion
+                    rows.append({"key": key, "value": value})  # Append structured key-value dict to the rows list
+                else:  # Handle lines that contain no colon delimiter as raw content entries
+                    rows.append({"key": stripped, "value": None})  # Append line as key with None value for unstructured lines
+
+        if rows:  # Verify rows were successfully parsed before constructing the DataFrame
+            df = pd.DataFrame(rows)  # Construct DataFrame from the list of parsed key-value dicts
+            return df  # Return the constructed key-value DataFrame
+
+        with open(input_path, "r", encoding="utf-8", errors="replace") as fh:  # Re-open file for fallback line-by-line parsing as last resort
+            all_lines = [line.rstrip("\n") for line in fh if line.strip()]  # Read all non-empty lines stripped of trailing newlines
+
+        df = pd.DataFrame({"line": all_lines})  # Construct single-column fallback DataFrame from raw line content
+        return df  # Return the fallback single-column DataFrame
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
+
 def load_pcap_dataset(input_path: str) -> pd.DataFrame:
     """
     Load a PCAP binary file into a pandas DataFrame using Scapy's PcapReader.
