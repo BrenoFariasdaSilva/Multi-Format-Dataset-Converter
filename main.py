@@ -6,29 +6,34 @@ Author      : Breno Farias da Silva
 Created     : 2025-05-31
 
 Short Description:
-    Command-line utility that discovers datasets (ARFF, CSV, Parquet, TXT)
+    Command-line utility that recursively discovers datasets (ARFF, CSV, Parquet, TXT, PCAP, PCAP-Stats)
     under an input directory, applies lightweight structural cleaning to
     text-based formats, loads them into pandas DataFrames, and writes
     converted outputs (ARFF, CSV, Parquet, TXT) to a mirrored `Output`
-    directory structure.
+    directory structure. Also supports PCAP and PCAP-Stats binary/summary files.
 
-Defaults & Behavior:
+Key Features & Behavior:
     - Default input directory: ./Input
     - Default output directory: ./Output
-    - Supported input formats: .arff, .csv, .parquet, .txt
+    - Supported input formats: .arff, .csv, .parquet, .txt, .pcap, .stats
+    - Supported output formats: .arff, .csv, .parquet, .txt
     - Cleaning: minimal whitespace/domain-list normalization for ARFF/CSV/TXT
     - Parquet files are rewritten via `fastparquet` for consistency
+    - PCAP files are parsed to DataFrames (Scapy), PCAP-Stats are loaded as tabular summaries
     - Conversion preserves directory hierarchy relative to `Input`
+    - Disk-space checks before writing outputs
     - Optional completion sound (platform-dependent)
+    - Extensive CLI options: `-i/--input`, `-o/--output`, `-f/--formats`, `-v/--verbose`, etc.
+    - Robust error handling and logging (to file and terminal)
 
 Usage:
     - Run interactively:
-        python3 main.py
+        python3 main.py 
     - Or pass CLI args: `-i/--input`, `-o/--output`, `-f/--formats`, `-v/--verbose`
 
 Dependencies (non-exhaustive):
     - Python 3.8+
-    - pandas, fastparquet, scipy, liac-arff (arff), colorama, tqdm
+    - pandas, fastparquet, scipy, liac-arff (arff), colorama, tqdm, scapy
 
 Notes and Caveats:
     - The converter performs pragmatic cleaning only; do not rely on it to
@@ -36,11 +41,13 @@ Notes and Caveats:
     - The script uses both `scipy` and `liac-arff` as fallbacks for ARFF.
     - Disk-space verifies are performed before writing outputs.
     - The module expects UTF-8 encoded text files.
+    - PCAP and PCAP-Stats support is best-effort and may require additional dependencies.
 
 TODOs (short):
     - Add unit tests and more robust CSV parsing
     - Add optional parallel conversion mode for large workloads
     - Provide more granular CLI control for cleaning rules
+    - Enhance PCAP/Stats parsing and error reporting
 """
 
 
