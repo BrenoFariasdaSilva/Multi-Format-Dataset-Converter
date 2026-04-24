@@ -99,6 +99,26 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def iterate_and_process_with_pbar(pbar, input_directory: str, output_directory: str, formats_list: list, len_dataset_files: int) -> None:
+    """
+    Iterate progress bar and delegate per-file processing to the per-file function.
+
+    :param pbar: Progress bar instance iterating dataset files.
+    :param input_directory: Source input directory used for relative calculations.
+    :param output_directory: Base output directory for converted files.
+    :param formats_list: List of output formats to generate for this run.
+    :param len_dataset_files: Total number of files in the current batch.
+    :return: None
+    """
+
+    try:  # Wrap function logic to ensure production-safe monitoring
+        for idx, input_path in enumerate(pbar, start=1):  # Iterate through each dataset file with index
+            process_single_input_file(idx, {"input_path": input_path, "input_directory": input_directory, "output_directory": output_directory, "formats_list": formats_list, "len_dataset_files": len_dataset_files, "pbar": pbar})  # Delegate per-file work to function
+    except Exception as e:  # Catch exceptions inside function
+        print(str(e))  # Print function exception to terminal for logs
+        raise  # Re-raise to preserve failure semantics
+
+
 def process_input_directory(context: dict) -> None:
     """
     Process a single explicit input directory for conversion.
