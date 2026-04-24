@@ -99,6 +99,33 @@ RUN_FUNCTIONS = {
 # Functions Definitions:
 
 
+def resolve_output_file_formats(formats_list: Optional[list]) -> list:
+    """
+    Resolve output_file_formats from configuration and return final target formats.
+
+    :param formats_list: The formats requested via CLI or per-call.
+    :return: The list of formats to actually generate.
+    """
+
+    try:  # Wrap resolution to avoid raising from malformed DEFAULTS
+        cfg_section = DEFAULTS.get("dataset_converter", {}) if DEFAULTS else {}  # Retrieve dataset_converter section from DEFAULTS
+        out_formats = cfg_section.get("output_file_formats", None)  # Retrieve configured output_file_formats from config
+
+        if out_formats is None:  # If configuration does not provide output_file_formats
+            return formats_list or []  # Return provided formats_list or empty list when not configured
+
+        norm = [str(file).lower() for file in (out_formats or [])]  # Normalize configured entries to lowercase strings
+        allowed = ["arff", "csv", "parquet", "txt"]  # Allowed target formats list
+        final = [file for file in norm if file in allowed]  # Filter configured formats to allowed set
+
+        if not final:  # If no valid configured formats remain after filtering
+            return formats_list or []  # Fallback to provided formats_list when config invalid or empty
+
+        return final  # Return the configured list of output formats
+    except Exception:  # Fallback on any unexpected error during resolution
+        return formats_list or []  # Return provided formats_list or empty list on error
+
+
 def resolve_destination_directory(input_directory, input_path, output_directory):
     """
     Determine where converted files should be saved.
