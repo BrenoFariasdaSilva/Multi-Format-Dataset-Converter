@@ -96,6 +96,9 @@ RUN_FUNCTIONS = {
 }
 
 
+# Functions Definitions:
+
+
 def verbose_output(true_string="", false_string=""):
 	"""
 	Outputs a message if the VERBOSE constant is set to True.
@@ -837,30 +840,59 @@ def play_sound():
 
 
 def main():
-	"""
-	Main function.
+    """
+    Main function.
 
-	:return: None
-	"""
+    :return: None
+    """
 
-	print(f"{BackgroundColors.CLEAR_TERMINAL}{BackgroundColors.BOLD}{BackgroundColors.GREEN}Welcome to the {BackgroundColors.CYAN}Multi-Format Dataset Converter{BackgroundColors.GREEN}!{Style.RESET_ALL}\n")  # Output the Welcome message
-	start_time = datetime.datetime.now()  # Get the start time of the program
+    try:  # Wrap full function logic to ensure production-safe monitoring
+        print(
+            f"{BackgroundColors.CLEAR_TERMINAL}{BackgroundColors.BOLD}{BackgroundColors.GREEN}Welcome to the {BackgroundColors.CYAN}Multi-Format Dataset Converter{BackgroundColors.GREEN}!{Style.RESET_ALL}\n"
+        )  # Output the Welcome message
+        start_time = datetime.datetime.now()  # Get the start time of the program
+        
+        initialize_defaults()  # Initialize DEFAULTS from get_default_config() and config.yaml
+        
+        args = parse_cli_arguments()  # Parse CLI arguments
 
-	args = parse_cli_arguments()  # Parse CLI arguments
+        resolved_low_memory = resolve_low_memory(args, DEFAULTS)  # Resolve low_memory setting from CLI arguments and configuration
+        
+        try:  # Attempt to store resolved low_memory back into DEFAULTS for use in other functions that read from it, but don't fail if this doesn't work (e.g., if DEFAULTS is not a dict or is immutable)
+            if isinstance(DEFAULTS, dict):  # Only attempt to set if DEFAULTS is a dict to avoid errors
+                DEFAULTS.setdefault("dataset_converter", {})  # Ensure the 'dataset_converter' section exists in DEFAULTS
+                DEFAULTS["dataset_converter"]["low_memory"] = resolved_low_memory  # Store the resolved low_memory value in DEFAULTS for use in other functions that read from it
+        except Exception:  # Catch any exception that occurs during this storage attempt to avoid crashing the program, since the resolved value is already stored in the local variable and can be used directly by functions that need it without relying on DEFAULTS
+            pass  # Silently ignore any errors that occur while trying to store the resolved low_memory value back into DEFAULTS, since this is a best-effort attempt to make it available for functions that read from DEFAULTS, but the program can still function correctly using the local variable without this storage if necessary
 
-	input_path, output_path = resolve_io_paths(args)  # Resolve and validate paths
-	if input_path is None or output_path is None:  # If either path is invalid
-		return  # Exit early if input/output paths are invalid
+        input_paths, output_path = resolve_io_paths(args)  # Resolve and validate paths, returning list of inputs
+        if input_paths is None or output_path is None:  # If either resolution failed
+            return  # Exit early when inputs/outputs are invalid
 
-	configure_verbose_mode(args)  # Enable verbose mode if requested
+        configure_verbose_mode(args)  # Enable verbose mode if requested
 
-	batch_convert(input_path, output_path, formats=args.formats if args.formats else None)  # Perform batch conversion of dataset files
+        configure_input_output_formats(args)  # Update DEFAULTS with input and output file formats from CLI
 
-	finish_time = datetime.datetime.now()  # Get the finish time of the program
-	print(f"{BackgroundColors.GREEN}Start time: {BackgroundColors.CYAN}{start_time.strftime('%d/%m/%Y - %H:%M:%S')}\n{BackgroundColors.GREEN}Finish time: {BackgroundColors.CYAN}{finish_time.strftime('%d/%m/%Y - %H:%M:%S')}\n{BackgroundColors.GREEN}Execution time: {BackgroundColors.CYAN}{calculate_execution_time(start_time, finish_time)}{Style.RESET_ALL}")  # Output the start and finish times
-	print(f"\n{BackgroundColors.BOLD}{BackgroundColors.GREEN}Program finished.{Style.RESET_ALL}")  # Output the end of the program message
+        output_formats = args.output_file_formats if args.output_file_formats else (args.formats if args.formats else None)  # Preference: --output-file-formats > --formats > config fallback
 
-	atexit.register(play_sound) if RUN_FUNCTIONS["Play Sound"] else None  # Register the play_sound function to be called when the program exits if RUN_FUNCTIONS["Play Sound"] is True
+        for input_path in input_paths:  # Iterate through each resolved input path
+            batch_convert(input_path, output_path, formats=output_formats)  # Perform batch conversion per input path
+
+        finish_time = datetime.datetime.now()  # Get the finish time of the program
+        print(
+            f"{BackgroundColors.GREEN}Start time: {BackgroundColors.CYAN}{start_time.strftime('%d/%m/%Y - %H:%M:%S')}\n{BackgroundColors.GREEN}Finish time: {BackgroundColors.CYAN}{finish_time.strftime('%d/%m/%Y - %H:%M:%S')}\n{BackgroundColors.GREEN}Execution time: {BackgroundColors.CYAN}{calculate_execution_time(start_time, finish_time)}{Style.RESET_ALL}"
+        )  # Output the start and finish times
+        print(
+            f"\n{BackgroundColors.BOLD}{BackgroundColors.GREEN}Program finished.{Style.RESET_ALL}"
+        )  # Output the end of the program message
+
+        (
+            atexit.register(play_sound) if RUN_FUNCTIONS["Play Sound"] else None
+        )  # Register the play_sound function to be called when the program exits if RUN_FUNCTIONS["Play Sound"] is True
+    except Exception as e:  # Catch any exception to ensure logging
+        print(str(e))  # Print error to terminal for server logs
+        raise  # Re-raise to preserve original failure semantics
+
 
 if __name__ == "__main__":
 	"""
