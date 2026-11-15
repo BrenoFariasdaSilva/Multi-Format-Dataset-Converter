@@ -26,7 +26,6 @@ Welcome to [Multi-Format-Dataset-Converter.](https://github.com/BrenoFariasdaSil
 ![wakatime](https://wakatime.com/badge/github/BrenoFariasdaSilva/Multi-Format-Dataset-Converter.svg)
 [![GitHub Contributors](https://img.shields.io/github/contributors/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter/graphs/contributors)
 [![GitHub Created At](https://img.shields.io/github/created-at/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)
-[![GitHub Repository Size](https://img.shields.io/github/repo-size/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)
 [![Open Issues](https://img.shields.io/github/issues/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter/issues)
 [![Closed Issues](https://img.shields.io/github/issues-closed/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter/issues?q=is%3Aissue+is%3Aclosed)
 [![Open Pull Requests](https://img.shields.io/github/issues-pr/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter/pulls)
