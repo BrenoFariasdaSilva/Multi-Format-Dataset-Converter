@@ -24,19 +24,6 @@ Welcome to [Multi-Format-Dataset-Converter.](https://github.com/BrenoFariasdaSil
 ![GitHub License](https://img.shields.io/github/license/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)
 ![GitHub Stars](https://img.shields.io/github/stars/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)
 ![wakatime](https://wakatime.com/badge/github/BrenoFariasdaSilva/Multi-Format-Dataset-Converter.svg)
-
-</div>
-
-<div align="center">
-
-![GitHub Code Size in Bytes](https://img.shields.io/github/languages/code-size/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)
-![GitHub Commits](https://img.shields.io/github/commit-activity/t/BrenoFariasdaSilva/Multi-Format-Dataset-Converter/main)
-![GitHub Last Commit](https://img.shields.io/github/last-commit/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)
-![GitHub Forks](https://img.shields.io/github/forks/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)
-![GitHub Language Count](https://img.shields.io/github/languages/count/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)
-![GitHub License](https://img.shields.io/github/license/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)
-![GitHub Stars](https://img.shields.io/github/stars/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)
-![wakatime](https://wakatime.com/badge/github/BrenoFariasdaSilva/Multi-Format-Dataset-Converter.svg)
 [![GitHub Contributors](https://img.shields.io/github/contributors/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter/graphs/contributors)
 [![GitHub Created At](https://img.shields.io/github/created-at/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)
 [![GitHub Repository Size](https://img.shields.io/github/repo-size/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter)
@@ -48,7 +35,6 @@ Welcome to [Multi-Format-Dataset-Converter.](https://github.com/BrenoFariasdaSil
 [![Merged PRs](https://img.shields.io/github/issues-search/BrenoFariasdaSilva/Multi-Format-Dataset-Converter?query=is%3Apr%20is%3Amerged&label=merged%20PRs&color=blue)](https://github.com/BrenoFariasdaSilva/Multi-Format-Dataset-Converter/pulls?q=is%3Apr+is%3Amerged)
 ![Language](https://img.shields.io/badge/Language-Python-3776AB)
 ![Formats](https://img.shields.io/badge/Formats-CSV%20ARFF%20Parquet%20TXT-457b9d)
-
 ![Repobeats Statistics](https://repobeats.axiom.co/api/embed/79cb6111c8daa897b9e7c0e941f2f28e277d7d8d.svg)
 
 </div>
